@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
-import { ShiningText } from "@/components/ui/shining-text.jsx";
+import { ShiningText } from "@/components/Font/shining-text.jsx";
 import meImage from "@/assets/me.jpg";
 import { User, Cpu, Terminal } from "lucide-react";
+import Television from "@/components/UI/Television.jsx";
+import Skill from "./Skill.jsx";
+import Projects from "./Projects.jsx";
 
 const TERMINAL_CONTENT = {
   about: `> Fetching identity...
@@ -32,18 +35,43 @@ VERSION CONTROL:
 5. Wish For Fun`,
 };
 
-import Skill from "./Skill.jsx";
-import Projects from "./Projects.jsx";
-
 export default function About() {
   const [activeTab, setActiveTab] = useState("about"); // "about", "skills", "projects"
+  const [tvActiveTab, setTvActiveTab] = useState("about"); // "about", "skills", "projects" for TV screen
   const [colorMode, setColorMode] = useState("green"); // "cyan", "amber", "green", "mono"
   const [isMonitorOn, setIsMonitorOn] = useState(false);
   const [terminalText, setTerminalText] = useState("");
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [knob1Rot, setKnob1Rot] = useState(0);
+  const [knob2Rot, setKnob2Rot] = useState(0);
+  const [isAntennaExtended, setIsAntennaExtended] = useState(true);
+
+  const handleKnob1Click = () => {
+    const modes = ["green", "cyan", "amber", "mono"];
+    const nextIndex = (modes.indexOf(colorMode) + 1) % modes.length;
+    setColorMode(modes[nextIndex]);
+    setKnob1Rot((prev) => prev + 90);
+  };
+
+  const handleKnob2Click = () => {
+    setIsMonitorOn((prev) => !prev);
+    setKnob2Rot((prev) => (prev === 0 ? 45 : 0));
+  };
+
+  const handleAntennaClick = () => {
+    setIsAntennaExtended((prev) => !prev);
+  };
+
+  const handleAntennaWheel = (e) => {
+    if (e.deltaY < 0) {
+      setIsAntennaExtended(true);
+    } else {
+      setIsAntennaExtended(false);
+    }
+  };
 
   const handleNavClick = (tab) => {
     setActiveTab(tab);
+    setTvActiveTab(tab);
     if (!isMonitorOn) {
       setIsMonitorOn(true);
     }
@@ -56,17 +84,7 @@ export default function About() {
     }
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 200) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+
 
   const colorPalettes = {
     cyan: {
@@ -75,7 +93,9 @@ export default function About() {
       text: "#b6e3f4",
       screenBg: "#061521",
       glow: "0 0 20px rgba(6,182,212,0.45)",
-      terminalHeader: "Cyan Terminal v4.1",
+      glow1: "rgba(6,182,212,0.35)",
+      glow2: "rgba(6,182,212,0.18)",
+      panelBorder: "rgba(6,182,212,0.3)",
     },
     amber: {
       accent: "rgba(245,158,11,1)", // Tailwind amber-500
@@ -83,7 +103,9 @@ export default function About() {
       text: "#fde68a",
       screenBg: "#1a1202",
       glow: "0 0 20px rgba(245,158,11,0.45)",
-      terminalHeader: "Amber Terminal v4.1",
+      glow1: "rgba(245,158,11,0.35)",
+      glow2: "rgba(245,158,11,0.18)",
+      panelBorder: "rgba(245,158,11,0.3)",
     },
     green: {
       accent: "rgba(34,197,94,1)", // Tailwind green-500
@@ -91,7 +113,9 @@ export default function About() {
       text: "#bbf7d0",
       screenBg: "#05180c",
       glow: "0 0 20px rgba(34,197,94,0.45)",
-      terminalHeader: "Green Matrix Terminal v4.1",
+      glow1: "rgba(34,197,94,0.35)",
+      glow2: "rgba(34,197,94,0.18)",
+      panelBorder: "rgba(34,197,94,0.3)",
     },
     mono: {
       accent: "rgba(226,232,240,1)", // Tailwind slate-200
@@ -99,7 +123,9 @@ export default function About() {
       text: "#f1f5f9",
       screenBg: "#0f172a",
       glow: "0 0 20px rgba(226,232,240,0.3)",
-      terminalHeader: "Monochrome Terminal v4.1",
+      glow1: "rgba(226,232,240,0.3)",
+      glow2: "rgba(226,232,240,0.15)",
+      panelBorder: "rgba(226,232,240,0.2)",
     },
   };
 
@@ -109,7 +135,7 @@ export default function About() {
   useEffect(() => {
     if (!isMonitorOn) return;
     let index = 0;
-    const fullText = TERMINAL_CONTENT[activeTab];
+    const fullText = TERMINAL_CONTENT[tvActiveTab];
 
     const interval = setInterval(() => {
       if (index === 0) {
@@ -124,7 +150,7 @@ export default function About() {
     }, 12);
 
     return () => clearInterval(interval);
-  }, [activeTab, isMonitorOn]);
+  }, [tvActiveTab, isMonitorOn]);
 
   return (
     <div
@@ -132,6 +158,7 @@ export default function About() {
         width: "100%",
         minHeight: "100vh",
         background: "linear-gradient(160deg, #0b2236 0%, #0d2a3a 40%, #071a28 100%)",
+        backgroundAttachment: "fixed",
         position: "relative",
         overflowX: "hidden",
       }}
@@ -268,8 +295,8 @@ export default function About() {
               }}
             >
               <IconComponent size={26} style={{ filter: isActive ? `drop-shadow(0 0 4px ${currentTheme.accent})` : "none" }} />
-              <span style={{ fontSize: "11px", fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                {tab.substring(0, 5)}
+              <span style={{ fontSize: "10px", fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                {tab}
               </span>
             </button>
           );
@@ -279,7 +306,7 @@ export default function About() {
       {/* Background Grid Pattern overlay */}
       <div
         style={{
-          position: "absolute",
+          position: "fixed",
           inset: 0,
           backgroundImage: `
             linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
@@ -420,286 +447,132 @@ export default function About() {
         </div>
 
         {/* ── RIGHT COLUMN: CRT TERMINAL MONITOR ── */}
-        <div style={{ flex: "1 1 450px", display: "flex", justifyContent: "center" }}>
+        <div style={{ flex: "1 1 500px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "28px" }}>
           
-          {/* Outer monitor cabinet frame */}
-          <div
-            style={{
-              width: "100%",
-              maxWidth: "480px",
-              background: "linear-gradient(135deg, #2e3a47 0%, #1e2630 60%, #121820 100%)",
-              borderRadius: "16px",
-              padding: "16px 16px 24px 16px",
-              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8), inset 0 2px 2px rgba(255,255,255,0.1)",
-              border: "1.5px solid #0d1217",
-              position: "relative",
+          <Television
+            isTvOn={isMonitorOn}
+            isZooming={false}
+            isAntennaExtended={isAntennaExtended}
+            knob1Rot={knob1Rot}
+            knob2Rot={knob2Rot}
+            handleKnob1Click={handleKnob1Click}
+            handleKnob2Click={handleKnob2Click}
+            handleAntennaClick={handleAntennaClick}
+            handleAntennaWheel={handleAntennaWheel}
+            handleScreenClick={() => {
+              if (!isMonitorOn) {
+                setIsMonitorOn(true);
+              }
+            }}
+            currentPalette={{
+              glow1: currentTheme.glow1,
+              glow2: currentTheme.glow2,
+              screenBg: currentTheme.screenBg,
             }}
           >
-            {/* Monitor Brand Label */}
-            <div
-              style={{
-                fontSize: "10px",
-                color: "rgba(255,255,255,0.2)",
-                fontFamily: "monospace",
-                textAlign: "center",
-                marginBottom: "10px",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-              }}
-            >
-              HEXTA MONITOR // MODEL C-88
-            </div>
+            {/* Vintage Snow Static Noise */}
+            {isMonitorOn && <div className="tv-static-noise" style={{ opacity: 0.1 }} />}
 
-            {/* Inner Monitor Bezel */}
-            <div
-              style={{
-                background: "#0c1117",
-                borderRadius: "10px",
-                padding: "8px",
-                boxShadow: "inset 0 4px 12px rgba(0,0,0,0.9)",
-              }}
-            >
-              {/* Screen Area Container */}
+
+            {/* Screen Interactive Terminal Logs */}
+            {isMonitorOn ? (
               <div
-                className={isMonitorOn ? "tv-bad-signal" : ""}
                 style={{
-                  position: "relative",
-                  width: "100%",
-                  aspectRatio: "4 / 3",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  background: isMonitorOn ? currentTheme.screenBg : "#030406",
-                  transition: "background 0.3s ease",
-                  boxShadow: isMonitorOn ? undefined : "inset 0 0 20px rgba(0,0,0,0.95)",
+                  padding: "16px 16px 16px 16px",
+                  height: "100%",
+                  boxSizing: "border-box",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  fontFamily: "monospace",
+                  fontSize: "12px",
+                  lineHeight: "1.45",
+                  color: currentTheme.text,
+                  whiteSpace: "pre-wrap",
+                  overflowY: "auto",
                 }}
               >
-                {/* Vintage Snow Static Noise */}
-                {isMonitorOn && <div className="tv-static-noise" style={{ opacity: 0.1 }} />}
-
-                {/* Scanline pattern overlay */}
-                {isMonitorOn && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))",
-                      backgroundSize: "100% 3px, 6px 100%",
-                      pointerEvents: "none",
-                      zIndex: 3,
-                    }}
-                  />
-                )}
-
-                {/* CRT corner vignette */}
+                {terminalText}
+                {/* Blinking Cursor */}
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "8px",
+                    height: "12px",
+                    background: currentTheme.text,
+                    marginLeft: "4px",
+                    animation: "blink-anim 0.8s infinite steps(2)",
+                  }}
+                />
+              </div>
+            ) : (
+              <>
                 <div
                   style={{
                     position: "absolute",
                     inset: 0,
-                    background: "radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(0,0,0,0.4) 100%)",
-                    pointerEvents: "none",
-                    zIndex: 3,
+                    backgroundImage: `url(${meImage})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    opacity: 0.95,
+                    filter: "brightness(95%) contrast(100%)",
+                    transition: "opacity 0.5s ease",
                   }}
                 />
-
-                {/* Terminal Header Info */}
-                {isMonitorOn && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      background: "rgba(0,0,0,0.3)",
-                      padding: "6px 12px",
-                      borderBottom: `1px solid ${currentTheme.accentBg}`,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      zIndex: 2,
-                      fontFamily: "monospace",
-                      fontSize: "9px",
-                      color: currentTheme.accent,
-                    }}
-                  >
-                    <span>{currentTheme.terminalHeader}</span>
-                    <span style={{ opacity: 0.7 }}>Baud: 9600</span>
-                  </div>
-                )}
-
-                {/* Screen Interactive Terminal Logs */}
-                {isMonitorOn ? (
-                  <div
-                    style={{
-                      padding: "36px 16px 16px 16px",
-                      height: "100%",
-                      boxSizing: "border-box",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "flex-start",
-                      fontFamily: "monospace",
-                      fontSize: "12px",
-                      lineHeight: "1.45",
-                      color: currentTheme.text,
-                      whiteSpace: "pre-wrap",
-                      overflowY: "auto",
-                    }}
-                  >
-                    {terminalText}
-                    {/* Blinking Cursor */}
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: "8px",
-                        height: "12px",
-                        background: currentTheme.text,
-                        marginLeft: "4px",
-                        animation: "blink-anim 0.8s infinite steps(2)",
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <>
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        backgroundImage: `url(${meImage})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        opacity: 0.95,
-                        filter: "brightness(95%) contrast(100%)",
-                        transition: "opacity 0.5s ease",
-                      }}
-                    />
-                    {/* Screen OFF pattern (faint phosphor dot in center) */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "4px",
-                        height: "4px",
-                        borderRadius: "50%",
-                        background: "rgba(255,255,255,0.05)",
-                        boxShadow: "0 0 10px rgba(255,255,255,0.05)",
-                        zIndex: 1,
-                      }}
-                    />
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Monitor Control Bar (Power light, Power Button, Dials) */}
-            <div
-              style={{
-                display: "flex",
-                marginTop: "16px",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0 8px",
-              }}
-            >
-              {/* Power LED & Dial controls */}
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                {/* Glowing LED Power Light */}
+                {/* Screen OFF pattern (faint phosphor dot in center) */}
                 <div
                   style={{
-                    width: "6px",
-                    height: "6px",
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: "4px",
+                    height: "4px",
                     borderRadius: "50%",
-                    background: isMonitorOn ? "#39ff14" : "#ff073a",
-                    boxShadow: isMonitorOn ? "0 0 8px #39ff14" : "0 0 8px #ff073a",
-                    transition: "background 0.3s ease, box-shadow 0.3s ease",
+                    background: "rgba(255,255,255,0.05)",
+                    boxShadow: "0 0 10px rgba(255,255,255,0.05)",
+                    zIndex: 1,
                   }}
                 />
+              </>
+            )}
+          </Television>
 
-                {/* Subtitle / Mode label */}
-                <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.3)", fontFamily: "monospace", letterSpacing: "0.1em" }}>
-                  POWER {isMonitorOn ? "ON" : "OFF"}
-                </span>
-              </div>
-
-              {/* Selector Tabs (Integrated in monitor control dial style) */}
-              {isMonitorOn && (
-                <div style={{ display: "flex", gap: "6px" }}>
-                  {["about", "skills", "projects"].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => {
-                        setActiveTab(tab);
-                        if (tab === "skills") {
-                          document.getElementById("skills-section")?.scrollIntoView({ behavior: "smooth" });
-                        } else if (tab === "projects") {
-                          document.getElementById("projects-section")?.scrollIntoView({ behavior: "smooth" });
-                        } else if (tab === "about") {
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }
-                      }}
-                      style={{
-                        background: activeTab === tab ? currentTheme.accent : "#1e2630",
-                        border: "1px solid #0d1217",
-                        borderRadius: "4px",
-                        padding: "4px 8px",
-                        color: activeTab === tab ? (colorMode === "mono" ? "#0f172a" : "#000") : "rgba(255,255,255,0.5)",
-                        fontSize: "9px",
-                        fontWeight: 700,
-                        fontFamily: "monospace",
-                        cursor: "pointer",
-                        textTransform: "uppercase",
-                        boxShadow: activeTab === tab ? "0 0 6px rgba(255,255,255,0.15)" : "none",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (activeTab !== tab) e.currentTarget.style.color = "#ffffff";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (activeTab !== tab) e.currentTarget.style.color = "rgba(255,255,255,0.5)";
-                      }}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Monitor Power Button */}
-              <button
-                onClick={() => setIsMonitorOn((prev) => !prev)}
-                style={{
-                  width: "28px",
-                  height: "28px",
-                  borderRadius: "50%",
-                  background: isMonitorOn
-                    ? "radial-gradient(circle at 35% 35%, #2a3543 0%, #171d24 100%)"
-                    : "radial-gradient(circle at 35% 35%, #46556b 0%, #222b37 100%)",
-                  border: "1.5px solid #0c1117",
-                  boxShadow: "0 2px 5px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  outline: "none",
-                  transition: "transform 0.1s ease",
-                }}
-                onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.92)")}
-                onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              >
-                {/* Power Icon glyph */}
-                <span
+          {/* Selector Tabs (Integrated under the TV) */}
+          {isMonitorOn && (
+            <div style={{ display: "flex", gap: "10px" }}>
+              {["about", "skills", "projects"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => {
+                    setTvActiveTab(tab);
+                  }}
                   style={{
-                    fontSize: "8px",
-                    color: isMonitorOn ? "rgba(255,255,255,0.3)" : "#ffffff",
+                    background: tvActiveTab === tab ? currentTheme.accent : "#1e2630",
+                    border: "1px solid #0d1217",
+                    borderRadius: "6px",
+                    padding: "8px 16px",
+                    color: tvActiveTab === tab ? (colorMode === "mono" ? "#0f172a" : "#000") : "rgba(255,255,255,0.5)",
+                    fontSize: "12px",
+                    fontWeight: 700,
                     fontFamily: "monospace",
-                    fontWeight: 900,
+                    cursor: "pointer",
+                    textTransform: "uppercase",
+                    boxShadow: tvActiveTab === tab ? "0 0 6px rgba(255,255,255,0.15)" : "none",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (tvActiveTab !== tab) e.currentTarget.style.color = "#ffffff";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (tvActiveTab !== tab) e.currentTarget.style.color = "rgba(255,255,255,0.5)";
                   }}
                 >
-                  ⏽
-                </span>
-              </button>
+                  {tab}
+                </button>
+              ))}
             </div>
-          </div>
+          )}
         </div>
       </div>
         </div>

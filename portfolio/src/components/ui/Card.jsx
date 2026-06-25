@@ -1,4 +1,4 @@
-import { CometCard } from "@/components/ui/comet-card.jsx";
+import { CometCard } from "@/components/Font/comet-card.jsx";
 
 export default function Card({
   title,

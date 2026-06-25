@@ -6,10 +6,15 @@ import About from './pages/About.jsx';
 const App = () => {
   const [showPreloader, setShowPreloader] = useState(true);
 
+  const handleComplete = () => {
+    setShowPreloader(false);
+    window.scrollTo({ top: 0, left: 0 });
+  };
+
   return (
     <div>
       {showPreloader && (
-        <Preloading onComplete={() => setShowPreloader(false)} />
+        <Preloading onComplete={handleComplete} />
       )}
       <About />
     </div>

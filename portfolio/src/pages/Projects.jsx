@@ -1,7 +1,34 @@
-import { ShiningText } from "@/components/ui/shining-text.jsx";
-import Card from "@/components/ui/Card.jsx";
+import { useEffect, useRef } from "react";
+import { ShiningText } from "@/components/Font/shining-text.jsx";
+import Card from "@/components/UI/Card.jsx";
 
 export default function Projects({ colorMode = "green" }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          } else {
+            entry.target.classList.remove("visible");
+          }
+        });
+      },
+      {
+        threshold: 0.05,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    const cards = containerRef.current?.querySelectorAll(".reveal-card");
+    cards?.forEach((card) => observer.observe(card));
+
+    return () => {
+      cards?.forEach((card) => observer.unobserve(card));
+    };
+  }, []);
   const colorPalettes = {
     cyan: {
       accent: "rgba(6,182,212,1)",
@@ -120,18 +147,6 @@ export default function Projects({ colorMode = "green" }) {
         scrollMarginTop: "80px",
       }}
     >
-      {/* Scanline overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%)",
-          backgroundSize: "100% 4px",
-          pointerEvents: "none",
-          zIndex: 2,
-          opacity: 0.4,
-        }}
-      />
 
       {/* Header */}
       <div
@@ -197,6 +212,7 @@ export default function Projects({ colorMode = "green" }) {
 
       {/* Projects Grid */}
       <div
+        ref={containerRef}
         style={{
           display: "flex",
           maxWidth: "1100px",
@@ -208,11 +224,21 @@ export default function Projects({ colorMode = "green" }) {
         }}
       >
         {projectList.map((proj, idx) => (
-          <Card
+          <div
             key={idx}
-            colorMode={colorMode}
-            {...proj}
-          />
+            className="reveal-card"
+            style={{
+              transitionDelay: `${idx * 0.15}s`,
+              display: "flex",
+              flex: "1 1 320px",
+              maxWidth: "380px",
+            }}
+          >
+            <Card
+              colorMode={colorMode}
+              {...proj}
+            />
+          </div>
         ))}
       </div>
     </div>
