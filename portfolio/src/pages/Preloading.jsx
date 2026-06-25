@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import FuzzyText from "./FuzzyText";
+import { ShiningText } from "@/components/ui/shining-text.jsx";
 
 const injectStyles = () => {
   const id = "preloader-tv-styles";
@@ -55,6 +55,7 @@ export default function Preloading() {
   const [isTvOn, setIsTvOn] = useState(true);
   const [knob1Rot, setKnob1Rot] = useState(0);
   const [knob2Rot, setKnob2Rot] = useState(0);
+  const [isAntennaExtended, setIsAntennaExtended] = useState(true);
 
   useEffect(() => {
     injectStyles();
@@ -64,40 +65,40 @@ export default function Preloading() {
 
   const colorPalettes = {
     cyan: {
-      screenBg: "radial-gradient(ellipse at 45% 42%, #ffffff 0%, #dceeff 35%, #b8d8f8 65%, #9ac4ef 100%)",
-      glow1: "rgba(100,200,255,0.3)",
-      glow2: "rgba(150,220,255,0.15)",
-      subText: "rgba(20,50,110,0.55)",
-      mainText: "rgba(10,30,90,0.82)",
-      lineBg: "rgba(20,50,110,0.25)",
-      textShadow: "0 0 30px rgba(80,150,255,0.35), 0 2px 0 rgba(255,255,255,0.5)",
+      screenBg: "#050505",
+      glow1: "rgba(100,200,255,0.35)",
+      glow2: "rgba(150,220,255,0.18)",
+      subText: "rgba(100,200,255,0.7)",
+      mainText: "#ffffff",
+      lineBg: "rgba(100,200,255,0.3)",
+      textShadow: "0 0 10px rgba(0,0,0,0.8)",
     },
     amber: {
-      screenBg: "radial-gradient(ellipse at 45% 42%, #ffffff 0%, #ffecca 35%, #ffd29c 65%, #ffb770 100%)",
-      glow1: "rgba(255,180,100,0.35)",
-      glow2: "rgba(255,210,150,0.18)",
-      subText: "rgba(110,60,20,0.6)",
-      mainText: "rgba(90,40,10,0.85)",
-      lineBg: "rgba(110,60,20,0.3)",
-      textShadow: "0 0 30px rgba(255,150,80,0.35), 0 2px 0 rgba(255,255,255,0.5)",
+      screenBg: "#050505",
+      glow1: "rgba(255,180,100,0.4)",
+      glow2: "rgba(255,210,150,0.2)",
+      subText: "rgba(255,180,100,0.7)",
+      mainText: "#ffffff",
+      lineBg: "rgba(255,180,100,0.35)",
+      textShadow: "0 0 10px rgba(0,0,0,0.8)",
     },
     green: {
-      screenBg: "radial-gradient(ellipse at 45% 42%, #ffffff 0%, #e8ffd9 35%, #c2ffa8 65%, #9eff7a 100%)",
-      glow1: "rgba(120,255,100,0.3)",
-      glow2: "rgba(180,255,150,0.15)",
-      subText: "rgba(20,90,20,0.6)",
-      mainText: "rgba(10,70,10,0.85)",
-      lineBg: "rgba(20,90,20,0.3)",
-      textShadow: "0 0 30px rgba(100,255,100,0.35), 0 2px 0 rgba(255,255,255,0.5)",
+      screenBg: "#050505",
+      glow1: "rgba(120,255,100,0.35)",
+      glow2: "rgba(180,255,150,0.18)",
+      subText: "rgba(120,255,100,0.7)",
+      mainText: "#ffffff",
+      lineBg: "rgba(120,255,100,0.35)",
+      textShadow: "0 0 10px rgba(0,0,0,0.8)",
     },
     mono: {
-      screenBg: "radial-gradient(ellipse at 45% 42%, #ffffff 0%, #f2f2f2 35%, #d5d5d5 65%, #a8a8a8 100%)",
-      glow1: "rgba(220,220,220,0.25)",
-      glow2: "rgba(240,240,240,0.12)",
-      subText: "rgba(60,60,60,0.6)",
-      mainText: "rgba(30,30,30,0.85)",
-      lineBg: "rgba(60,60,60,0.3)",
-      textShadow: "0 0 30px rgba(200,200,200,0.35), 0 2px 0 rgba(255,255,255,0.5)",
+      screenBg: "#050505",
+      glow1: "rgba(220,220,220,0.3)",
+      glow2: "rgba(240,240,240,0.15)",
+      subText: "rgba(200,200,200,0.7)",
+      mainText: "#ffffff",
+      lineBg: "rgba(150,150,150,0.35)",
+      textShadow: "0 0 10px rgba(0,0,0,0.8)",
     }
   };
 
@@ -110,7 +111,19 @@ export default function Preloading() {
 
   const handleKnob2Click = () => {
     setIsTvOn(prev => !prev);
-    setKnob2Rot(prev => prev + 45);
+    setKnob2Rot(prev => (prev === 0 ? 45 : 0));
+  };
+
+  const handleAntennaClick = () => {
+    setIsAntennaExtended(prev => !prev);
+  };
+
+  const handleAntennaWheel = (e) => {
+    if (e.deltaY < 0) {
+      setIsAntennaExtended(true);
+    } else {
+      setIsAntennaExtended(false);
+    }
   };
 
   const currentPalette = colorPalettes[colorMode];
@@ -118,7 +131,8 @@ export default function Preloading() {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        position: "fixed",
+        inset: 0,
         background: "linear-gradient(160deg, #0b2236 0%, #0d2a3a 40%, #071a28 100%)",
         display: "flex",
         flexDirection: "column",
@@ -126,6 +140,7 @@ export default function Preloading() {
         justifyContent: "center",
         paddingTop: "120px", // Headroom for antennas
         boxSizing: "border-box",
+        zIndex: 9999,
       }}
     >
       {/* Room ambient glow top */}
@@ -178,23 +193,41 @@ export default function Preloading() {
               boxShadow: "0 -2px 5px rgba(0,0,0,0.5)",
             }} />
             
-            {/* Left Antenna Rod */}
-            <div style={{
-              position: "absolute",
-              bottom: "8px",
-              right: "50%",
-              width: "3px",
-              height: "140px",
-              background: "linear-gradient(to top, #34526d, #88a7c4)",
-              boxShadow: "0 0 3px rgba(0,0,0,0.4)",
-              transformOrigin: "bottom right",
-              transform: "rotate(-38deg) translate(-2px, 0)",
-            }}>
+            {/* Left Antenna Wrapper (Wider Hit-box & Scroll target) */}
+            <div 
+              onClick={handleAntennaClick}
+              onWheel={handleAntennaWheel}
+              style={{
+                position: "absolute",
+                bottom: "8px",
+                right: "calc(50% - 20px)",
+                width: "40px",
+                height: isAntennaExtended ? "140px" : "36px",
+                transformOrigin: "bottom center",
+                transform: "rotate(-38deg) translate(-2px, 0)",
+                cursor: "pointer",
+                pointerEvents: "auto",
+                transition: "height 0.5s cubic-bezier(0.25, 1, 0.5, 1)",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              {/* Actual 3px Rod */}
+              <div style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                width: "3px",
+                background: "linear-gradient(to top, #34526d, #88a7c4)",
+                boxShadow: "0 0 3px rgba(0,0,0,0.4)",
+              }} />
+              
               {/* Metallic Tip Ball */}
               <div style={{
                 position: "absolute",
                 top: "-6px",
-                left: "-2px",
+                left: "50%",
+                transform: "translateX(-50%)",
                 width: "7px",
                 height: "7px",
                 borderRadius: "50%",
@@ -203,23 +236,41 @@ export default function Preloading() {
               }} />
             </div>
 
-            {/* Right Antenna Rod */}
-            <div style={{
-              position: "absolute",
-              bottom: "8px",
-              left: "50%",
-              width: "3px",
-              height: "160px",
-              background: "linear-gradient(to top, #34526d, #88a7c4)",
-              boxShadow: "0 0 3px rgba(0,0,0,0.4)",
-              transformOrigin: "bottom left",
-              transform: "rotate(32deg) translate(2px, 0)",
-            }}>
+            {/* Right Antenna Wrapper (Wider Hit-box & Scroll target) */}
+            <div 
+              onClick={handleAntennaClick}
+              onWheel={handleAntennaWheel}
+              style={{
+                position: "absolute",
+                bottom: "8px",
+                left: "calc(50% - 20px)",
+                width: "40px",
+                height: isAntennaExtended ? "160px" : "40px",
+                transformOrigin: "bottom center",
+                transform: "rotate(32deg) translate(2px, 0)",
+                cursor: "pointer",
+                pointerEvents: "auto",
+                transition: "height 0.5s cubic-bezier(0.25, 1, 0.5, 1)",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              {/* Actual 3px Rod */}
+              <div style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                width: "3px",
+                background: "linear-gradient(to top, #34526d, #88a7c4)",
+                boxShadow: "0 0 3px rgba(0,0,0,0.4)",
+              }} />
+
               {/* Metallic Tip Ball */}
               <div style={{
                 position: "absolute",
                 top: "-6px",
-                left: "-2px",
+                left: "50%",
+                transform: "translateX(-50%)",
                 width: "7px",
                 height: "7px",
                 borderRadius: "50%",
@@ -229,12 +280,16 @@ export default function Preloading() {
             </div>
           </div>
 
-          {/* top tiny camera dot */}
+          {/* Power status indicator LED under antennas */}
           <div style={{
             position: "absolute", top: "10px", left: "50%", transform: "translateX(-50%)",
             width: "8px", height: "8px", borderRadius: "50%",
-            background: "#0a1e2e",
-            border: "1px solid rgba(100,160,200,0.15)",
+            background: isTvOn ? "#39ff14" : "#ff073a",
+            border: isTvOn ? "1px solid rgba(57,255,20,0.4)" : "1px solid rgba(255,7,58,0.4)",
+            boxShadow: isTvOn 
+              ? "0 0 10px #39ff14, 0 0 3px rgba(255,255,255,0.8)" 
+              : "0 0 10px #ff073a, 0 0 3px rgba(255,255,255,0.8)",
+            transition: "background 0.4s ease, box-shadow 0.4s ease, border 0.4s ease",
           }} />
 
           {/* main content row */}
@@ -265,7 +320,7 @@ export default function Preloading() {
                 }}>
                   {/* screen itself */}
                   <div
-                    className={isTvOn ? "tv-screen-anim" : ""}
+                    className={isTvOn ? "tv-screen-anim tv-bad-signal" : ""}
                     style={{
                       position: "relative",
                       width: "100%",
@@ -281,6 +336,9 @@ export default function Preloading() {
                   >
                     {/* scanline */}
                     {isTvOn && <div className="tv-scanline" />}
+
+                    {/* static noise background */}
+                    {isTvOn && <div className="tv-static-noise" />}
 
                     {/* CRT corner vignette */}
                     <div style={{
@@ -300,65 +358,42 @@ export default function Preloading() {
                           gap: "0px",
                         }}
                       >
+                        {/* No Signal Retro Card Box */}
                         <div style={{
-                          fontSize: "11px",
-                          color: currentPalette.subText,
-                          letterSpacing: "0.3em",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          fontFamily: "monospace",
-                          marginBottom: "4px",
+                          background: "rgba(0, 0, 0, 0.82)",
+                          border: "2px solid rgba(255, 255, 255, 0.7)",
+                          borderRadius: "6px",
+                          padding: "12px 20px",
+                          textAlign: "center",
+                          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.7)",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "4px",
                         }}>
-                          ◆ NOW BROADCASTING ◆
-                        </div>
-                        
-                        <FuzzyText
-                          fontSize={28}
-                          fontWeight={800}
-                          color={currentPalette.mainText}
-                          fontFamily="Georgia, 'Times New Roman', serif"
-                          baseIntensity={0.16}
-                          hoverIntensity={0.4}
-                          enableHover={true}
-                          glitchMode={true}
-                          glitchInterval={1800}
-                          glitchDuration={180}
-                        >
-                          Welcome to
-                        </FuzzyText>
-                        
-                        <FuzzyText
-                          fontSize={28}
-                          fontWeight={800}
-                          color={currentPalette.mainText}
-                          fontFamily="Georgia, 'Times New Roman', serif"
-                          baseIntensity={0.16}
-                          hoverIntensity={0.4}
-                          enableHover={true}
-                          glitchMode={true}
-                          glitchInterval={1800}
-                          glitchDuration={180}
-                        >
-                          Portfolio
-                        </FuzzyText>
 
-                        <div style={{
-                          width: "50px", height: "1.5px",
-                          background: currentPalette.lineBg,
-                          marginTop: "8px",
-                        }} />
+                          <div style={{
+                            fontSize: "24px",
+                            letterSpacing: "0.1em",
+                            fontWeight: 700,
+                            color: "#ffffff",
+                            fontFamily: "'Creepster', system-ui, sans-serif",
+                            textShadow: "0 0 8px rgba(255, 255, 255, 0.4)",
+                          }}>
+                            <ShiningText>Welcome to my Portfolio</ShiningText>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Brand label — AMIGA style at bottom center */}
+              {/* Brand label */}
               <div style={{
-                textAlign: "center", marginTop: "10px",
+                textAlign: "center", marginTop: "20px",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
               }}>
-                <span style={{ fontSize: "9px", color: "rgba(120,170,210,0.4)", letterSpacing: "0.05em" }}>✦</span>
                 <span style={{
                   fontSize: "12px",
                   fontWeight: 700,
@@ -367,7 +402,6 @@ export default function Preloading() {
                   fontFamily: "sans-serif",
                   textTransform: "uppercase",
                 }}>Sony</span>
-                <span style={{ fontSize: "9px", color: "rgba(120,170,210,0.4)" }}>™</span>
               </div>
             </div>
 
