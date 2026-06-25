@@ -1,8 +1,10 @@
-import React from 'react'
+import Preloading from './pages/Preloading';
 
 const App = () => {
   return (
-    <div>App</div>
+    <div>
+      <Preloading />
+    </div>
   )
 }
 
