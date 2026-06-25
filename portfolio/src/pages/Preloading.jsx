@@ -30,6 +30,14 @@ const injectStyles = () => {
       0%   { opacity: 0; transform: scale(0.94) translateY(6px); letter-spacing: 0.25em; }
       100% { opacity: 1; transform: scale(1) translateY(0); letter-spacing: 0.06em; }
     }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+    @keyframes fadeInOverlay {
+      0%   { opacity: 0; }
+      100% { opacity: 1; }
+    }
     .tv-screen-anim {
       animation: screenFadeInOut 3s ease-in-out infinite, glowPulse 3s ease-in-out infinite, flicker 9s infinite;
     }
@@ -49,13 +57,14 @@ const injectStyles = () => {
   document.head.appendChild(style);
 };
 
-export default function Preloading() {
+export default function Preloading({ onComplete }) {
   const [showText, setShowText] = useState(false);
   const [colorMode, setColorMode] = useState("cyan"); // "cyan", "amber", "green", "mono"
   const [isTvOn, setIsTvOn] = useState(true);
   const [knob1Rot, setKnob1Rot] = useState(0);
   const [knob2Rot, setKnob2Rot] = useState(0);
   const [isAntennaExtended, setIsAntennaExtended] = useState(true);
+  const [isZooming, setIsZooming] = useState(false);
 
   useEffect(() => {
     injectStyles();
@@ -167,6 +176,10 @@ export default function Preloading() {
             0 4px 0 #0a1a26,
             inset 0 1px 0 rgba(120,180,220,0.12)
           `,
+          transition: "transform 1.2s cubic-bezier(0.7, 0, 0.3, 1), opacity 1.2s ease-in-out",
+          transformOrigin: "235px 220px", // Centered roughly on the screen
+          transform: isZooming ? "scale(6.5)" : "scale(1)",
+          pointerEvents: isZooming ? "none" : "auto",
         }}>
           {/* Telescopic Rabbit Ear Antennas sitting on top-center of the TV Cabinet (2 rods) */}
           <div style={{
@@ -320,6 +333,16 @@ export default function Preloading() {
                 }}>
                   {/* screen itself */}
                   <div
+                    onClick={() => {
+                      if (!isTvOn) {
+                        setIsTvOn(true);
+                        return;
+                      }
+                      setIsZooming(true);
+                      setTimeout(() => {
+                        if (onComplete) onComplete();
+                      }, 1200);
+                    }}
                     className={isTvOn ? "tv-screen-anim tv-bad-signal" : ""}
                     style={{
                       position: "relative",
@@ -332,8 +355,22 @@ export default function Preloading() {
                       boxShadow: isTvOn ? undefined : "inset 0 0 30px rgba(0,0,0,0.95)",
                       "--glow-color-1": isTvOn ? currentPalette.glow1 : "transparent",
                       "--glow-color-2": isTvOn ? currentPalette.glow2 : "transparent",
+                      cursor: "pointer",
                     }}
                   >
+                    {/* Zoom transition overlay */}
+                    {isZooming && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          background: "#0b2236", // Matches About page background
+                          zIndex: 99,
+                          animation: "fadeInOverlay 1.1s forwards",
+                        }}
+                      />
+                    )}
+
                     {/* scanline */}
                     {isTvOn && <div className="tv-scanline" />}
 

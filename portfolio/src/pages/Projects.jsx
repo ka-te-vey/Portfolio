@@ -77,7 +77,7 @@ export default function Projects({ colorMode = "green" }) {
       launchBtnText: "Weather-App",
     },
     {
-      title: "Doc Genz",
+      title: "Doc Gen",
       subtitle: "PDF Document Generator",
       description: "A full-stack document generator featuring markdown compilation, real-time previewing, and PDF conversion using jspdf and html2canvas with a dual-prefix dev layout.",
       tech: ["React 19", "jspdf", "html2canvas", "NodeJS"],
@@ -117,6 +117,7 @@ export default function Projects({ colorMode = "green" }) {
         boxSizing: "border-box",
         position: "relative",
         overflow: "hidden",
+        scrollMarginTop: "80px",
       }}
     >
       {/* Scanline overlay */}

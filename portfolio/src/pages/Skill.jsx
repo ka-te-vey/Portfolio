@@ -94,6 +94,7 @@ export default function Skill({ colorMode = "green" }) {
         boxSizing: "border-box",
         position: "relative",
         overflow: "hidden",
+        scrollMarginTop: "80px",
       }}
     >
       {/* Retro scanline overlay */}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ShiningText } from "@/components/ui/shining-text.jsx";
 import meImage from "@/assets/me.jpg";
+import { User, Cpu, Terminal } from "lucide-react";
 
 const TERMINAL_CONTENT = {
   about: `> Fetching identity...
@@ -39,6 +40,33 @@ export default function About() {
   const [colorMode, setColorMode] = useState("green"); // "cyan", "amber", "green", "mono"
   const [isMonitorOn, setIsMonitorOn] = useState(false);
   const [terminalText, setTerminalText] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleNavClick = (tab) => {
+    setActiveTab(tab);
+    if (!isMonitorOn) {
+      setIsMonitorOn(true);
+    }
+    if (tab === "about") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (tab === "skills") {
+      document.getElementById("skills-section")?.scrollIntoView({ behavior: "smooth" });
+    } else if (tab === "projects") {
+      document.getElementById("projects-section")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 200) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const colorPalettes = {
     cyan: {
@@ -108,6 +136,146 @@ export default function About() {
         overflowX: "hidden",
       }}
     >
+      {/* Responsive Styles for Sidebar */}
+      <style>{`
+        @media (max-width: 1024px) {
+          .glass-sidebar {
+            position: fixed !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            top: auto !important;
+            width: 100% !important;
+            height: 64px !important;
+            transform: none !important;
+            flex-direction: row !important;
+            justify-content: center !important;
+            gap: 40px !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            border-top: 1.5px solid var(--panel-border) !important;
+            border-left: none !important;
+            border-right: none !important;
+            border-bottom: none !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            box-shadow: none !important;
+          }
+          .glass-sidebar button {
+            position: static !important;
+            transform: none !important;
+            width: auto !important;
+            height: 100% !important;
+            padding: 0 16px !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+          .glass-sidebar-glow {
+            display: none !important;
+          }
+        }
+        @media (min-width: 1025px) {
+          .main-content-wrapper {
+            padding-right: 130px !important;
+            padding-left: 0px !important;
+          }
+        }
+      `}</style>
+
+      {/* Sticky Glassmorphic Sidebar */}
+      <aside
+        className="glass-sidebar"
+        style={{
+          position: "fixed",
+          left: "auto",
+          right: "24px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          width: "108px",
+          height: "440px",
+          background: "rgba(45, 55, 72, 0.95)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          border: `1.5px solid ${currentTheme.panelBorder}`,
+          borderRadius: "28px",
+          boxSizing: "border-box",
+          zIndex: 1000,
+          boxShadow: "inset 0 1px 1px rgba(255,255,255,0.1), 0 20px 40px rgba(0, 0, 0, 0.6)",
+          "--panel-border": currentTheme.panelBorder,
+        }}
+      >
+        {/* Glow indicator */}
+        <div
+          className="glass-sidebar-glow"
+          style={{
+            position: "absolute",
+            left: "48px",
+            top: "28px",
+            width: "12px",
+            height: "12px",
+            borderRadius: "50%",
+            background: currentTheme.accent,
+            boxShadow: currentTheme.glow,
+            opacity: 1,
+          }}
+        />
+
+        {/* Navigation Items stacked vertically */}
+        {["about", "skills", "projects"].map((tab, idx) => {
+          const isActive = activeTab === tab;
+          
+          // Select appropriate icon
+          let IconComponent = User;
+          if (tab === "skills") IconComponent = Cpu;
+          if (tab === "projects") IconComponent = Terminal;
+
+          return (
+            <button
+              key={tab}
+              onClick={() => handleNavClick(tab)}
+              title={tab.toUpperCase()}
+              style={{
+                position: "absolute",
+                left: "18px",
+                top: `${76 + idx * 112}px`, // Stacked: 76px, 188px, 300px
+                transform: "none",
+                background: isActive ? currentTheme.accentBg : "transparent",
+                border: isActive ? `2px solid ${currentTheme.accent}` : "2px solid transparent",
+                color: isActive ? currentTheme.accent : "rgba(255, 255, 255, 0.5)",
+                width: "72px",
+                height: "72px",
+                borderRadius: "16px",
+                cursor: "pointer",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "5px",
+                transition: "all 0.2s ease",
+                boxShadow: isActive ? `inset 0 0 6px ${currentTheme.accentBg}` : "none",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.color = "#ffffff";
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.color = "rgba(255, 255, 255, 0.5)";
+                  e.currentTarget.style.background = "transparent";
+                }
+              }}
+            >
+              <IconComponent size={26} style={{ filter: isActive ? `drop-shadow(0 0 4px ${currentTheme.accent})` : "none" }} />
+              <span style={{ fontSize: "11px", fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                {tab.substring(0, 5)}
+              </span>
+            </button>
+          );
+        })}
+      </aside>
+
       {/* Background Grid Pattern overlay */}
       <div
         style={{
@@ -124,6 +292,7 @@ export default function About() {
       />
       <div style={{ position: "relative", zIndex: 1 }}>
         <div
+          className="main-content-wrapper"
           style={{
             width: "100%",
             minHeight: "750px",
