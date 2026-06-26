@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { ShiningText } from "@/components/Font/shining-text.jsx";
 import Card from "@/components/UI/Card.jsx";
+import CircularGallary from "@/components/Effect/CircularGallary.jsx";
+import Shuffle from "@/components/Font/Shuffle.jsx";
 
 export default function Projects({ colorMode = "green" }) {
   const containerRef = useRef(null);
@@ -184,8 +185,10 @@ export default function Projects({ colorMode = "green" }) {
           </span>
         </div>
 
-        <h2
-          className="bitcount-text"
+        <Shuffle
+          text="Projects Library"
+          tag="h2"
+          className="silkscreen-text"
           style={{
             fontSize: "48px",
             lineHeight: "1.2",
@@ -194,9 +197,11 @@ export default function Projects({ colorMode = "green" }) {
             letterSpacing: "0.05em",
             textShadow: "0 0 15px rgba(255,255,255,0.15)",
           }}
-        >
-          <ShiningText className="bitcount-text">Projects Library</ShiningText>
-        </h2>
+          shuffleDirection="right"
+          duration={0.5}
+          stagger={0.03}
+          scrambleCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%#$@*"
+        />
         <p
           style={{
             fontSize: "14px",
@@ -204,42 +209,40 @@ export default function Projects({ colorMode = "green" }) {
             fontFamily: "monospace",
             maxWidth: "500px",
             margin: 0,
+            lineHeight: "1.5",
+            fontWeight: 500,
           }}
         >
           Accessing active deployment pipelines. High priority targets rendered below.
         </p>
       </div>
 
-      {/* Projects Grid */}
+      {/* Projects Circular Gallery */}
       <div
-        ref={containerRef}
         style={{
-          display: "flex",
           maxWidth: "1100px",
           width: "100%",
-          gap: "30px",
+          height: "600px",
           zIndex: 1,
-          flexWrap: "wrap",
+          display: "flex",
           justifyContent: "center",
+          alignItems: "center",
+          marginTop: "20px",
         }}
       >
-        {projectList.map((proj, idx) => (
-          <div
-            key={idx}
-            className="reveal-card"
-            style={{
-              transitionDelay: `${idx * 0.15}s`,
-              display: "flex",
-              flex: "1 1 320px",
-              maxWidth: "380px",
-            }}
-          >
+        <CircularGallary
+          bend={3}
+          scrollSpeed={1.5}
+          scrollEase={0.08}
+        >
+          {projectList.map((proj, idx) => (
             <Card
+              key={idx}
               colorMode={colorMode}
               {...proj}
             />
-          </div>
-        ))}
+          ))}
+        </CircularGallary>
       </div>
     </div>
   );

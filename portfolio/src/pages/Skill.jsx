@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { ShiningText } from "@/components/Font/shining-text.jsx";
 import Card from "@/components/UI/Card.jsx";
+import Shuffle from "@/components/Font/Shuffle.jsx";
 import { 
   Monitor, Cpu, Terminal, Code2, GitBranch, 
   Atom, Palette, Code, PenTool, FileCode, 
@@ -161,8 +161,10 @@ export default function Skill({ colorMode = "green" }) {
           </span>
         </div>
 
-        <h2
-          className="bitcount-text"
+        <Shuffle
+          text="Capabilities Deck"
+          tag="h2"
+          className="silkscreen-text"
           style={{
             fontSize: "48px",
             lineHeight: "1.2",
@@ -171,9 +173,11 @@ export default function Skill({ colorMode = "green" }) {
             letterSpacing: "0.05em",
             textShadow: "0 0 15px rgba(255,255,255,0.15)",
           }}
-        >
-          <ShiningText className="bitcount-text">Capabilities Deck</ShiningText>
-        </h2>
+          shuffleDirection="right"
+          duration={0.5}
+          stagger={0.03}
+          scrambleCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%#$@*"
+        />
         <p
           style={{
             fontSize: "14px",
@@ -181,6 +185,8 @@ export default function Skill({ colorMode = "green" }) {
             fontFamily: "monospace",
             maxWidth: "500px",
             margin: 0,
+            lineHeight: "1.5",
+            fontWeight: 500,
           }}
         >
           Analyzing engineering profile and tech-stack proficiencies. All systems optimized.

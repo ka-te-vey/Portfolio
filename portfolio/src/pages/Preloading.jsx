@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { ShiningText } from "@/components/Font/shining-text.jsx";
 import Television from "@/components/UI/Television.jsx";
+import FuzzyText from "@/components/Font/FuzzyText.jsx";
 
 const injectStyles = () => {
   const id = "preloader-tv-styles";
@@ -195,30 +195,18 @@ export default function Preloading({ onComplete }) {
               gap: "0px",
             }}
           >
-            {/* No Signal Retro Card Box */}
-            <div style={{
-              background: "rgba(0, 0, 0, 0.82)",
-              border: "2px solid rgba(255, 255, 255, 0.7)",
-              borderRadius: "6px",
-              padding: "12px 20px",
-              textAlign: "center",
-              boxShadow: "0 6px 20px rgba(0, 0, 0, 0.7)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "4px",
-            }}>
-              <div style={{
-                fontSize: "24px",
-                letterSpacing: "0.1em",
-                fontWeight: 700,
-                color: "#ffffff",
-                fontFamily: "'Creepster', system-ui, sans-serif",
-                textShadow: "0 0 8px rgba(255, 255, 255, 0.4)",
-              }}>
-                <ShiningText>Welcome to my Portfolio</ShiningText>
-              </div>
-            </div>
+            <FuzzyText
+              fontSize="28px"
+              fontWeight={700}
+              fontFamily="'Creepster', system-ui, sans-serif"
+              color="#ffffff"
+              baseIntensity={0.2}
+              hoverIntensity={0.5}
+              enableHover={true}
+              fuzzRange={10}
+            >
+              Welcome to my Portfolio
+            </FuzzyText>
           </div>
         )}
       </Television>

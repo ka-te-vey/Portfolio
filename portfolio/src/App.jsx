@@ -9,6 +9,10 @@ const App = () => {
   const handleComplete = () => {
     setShowPreloader(false);
     window.scrollTo({ top: 0, left: 0 });
+    setTimeout(() => {
+      window.dispatchEvent(new Event("preloaderComplete"));
+      window.dispatchEvent(new Event("resize"));
+    }, 150);
   };
 
   return (

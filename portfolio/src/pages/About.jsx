@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { ShiningText } from "@/components/Font/shining-text.jsx";
 import meImage from "@/assets/me.jpg";
-import { User, Cpu, Terminal } from "lucide-react";
 import Television from "@/components/UI/Television.jsx";
+import Navbar from "@/components/UI/Navbar.jsx";
 import Skill from "./Skill.jsx";
 import Projects from "./Projects.jsx";
+import Contact from "./Contact.jsx";
 
 const TERMINAL_CONTENT = {
   about: `> Fetching identity...
@@ -33,11 +34,21 @@ VERSION CONTROL:
 3. Weather App
 4. Doc Genz
 5. Wish For Fun`,
+
+  contact: `> Initializing message gateway...
+[READY] Secure Channel Established.
+
+CONTACT PORTAL:
+- EMAIL: oscar19092019@gmail.com
+- GITHUB: github.com/ka-te-vey
+- LINKEDIN: linkedin.com/in/hap-sreypich-b38852390/
+
+Status: Awaiting transmission...`,
 };
 
 export default function About() {
-  const [activeTab, setActiveTab] = useState("about"); // "about", "skills", "projects"
-  const [tvActiveTab, setTvActiveTab] = useState("about"); // "about", "skills", "projects" for TV screen
+  const [activeTab, setActiveTab] = useState("about"); // "about", "skills", "projects", "contact"
+  const [tvActiveTab, setTvActiveTab] = useState("about"); // "about", "skills", "projects", "contact" for TV screen
   const [colorMode, setColorMode] = useState("green"); // "cyan", "amber", "green", "mono"
   const [isMonitorOn, setIsMonitorOn] = useState(false);
   const [terminalText, setTerminalText] = useState("");
@@ -81,8 +92,53 @@ export default function About() {
       document.getElementById("skills-section")?.scrollIntoView({ behavior: "smooth" });
     } else if (tab === "projects") {
       document.getElementById("projects-section")?.scrollIntoView({ behavior: "smooth" });
+    } else if (tab === "contact") {
+      document.getElementById("contact-section")?.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+      if (isAtBottom) {
+        setActiveTab("contact");
+        setTvActiveTab("contact");
+        return;
+      }
+
+      const sections = [
+        { id: "about", el: document.getElementById("about-section") },
+        { id: "skills", el: document.getElementById("skills-section") },
+        { id: "projects", el: document.getElementById("projects-section") },
+        { id: "contact", el: document.getElementById("contact-section") },
+      ];
+
+      let currentSection = "about";
+      let minDistance = Infinity;
+
+      sections.forEach((sec) => {
+        if (sec.el) {
+          const rect = sec.el.getBoundingClientRect();
+          const distance = Math.abs(rect.top - 150);
+          if (distance < minDistance) {
+            minDistance = distance;
+            currentSection = sec.id;
+          }
+        }
+      });
+
+      setActiveTab(currentSection);
+      setTvActiveTab(currentSection);
+    };
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
 
 
@@ -203,105 +259,17 @@ export default function About() {
         }
         @media (min-width: 1025px) {
           .main-content-wrapper {
-            padding-right: 130px !important;
+            padding-right: 0px !important;
             padding-left: 0px !important;
           }
         }
       `}</style>
 
-      {/* Sticky Glassmorphic Sidebar */}
-      <aside
-        className="glass-sidebar"
-        style={{
-          position: "fixed",
-          left: "auto",
-          right: "24px",
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: "108px",
-          height: "440px",
-          background: "rgba(45, 55, 72, 0.95)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          border: `1.5px solid ${currentTheme.panelBorder}`,
-          borderRadius: "28px",
-          boxSizing: "border-box",
-          zIndex: 1000,
-          boxShadow: "inset 0 1px 1px rgba(255,255,255,0.1), 0 20px 40px rgba(0, 0, 0, 0.6)",
-          "--panel-border": currentTheme.panelBorder,
-        }}
-      >
-        {/* Glow indicator */}
-        <div
-          className="glass-sidebar-glow"
-          style={{
-            position: "absolute",
-            left: "48px",
-            top: "28px",
-            width: "12px",
-            height: "12px",
-            borderRadius: "50%",
-            background: currentTheme.accent,
-            boxShadow: currentTheme.glow,
-            opacity: 1,
-          }}
-        />
-
-        {/* Navigation Items stacked vertically */}
-        {["about", "skills", "projects"].map((tab, idx) => {
-          const isActive = activeTab === tab;
-          
-          // Select appropriate icon
-          let IconComponent = User;
-          if (tab === "skills") IconComponent = Cpu;
-          if (tab === "projects") IconComponent = Terminal;
-
-          return (
-            <button
-              key={tab}
-              onClick={() => handleNavClick(tab)}
-              title={tab.toUpperCase()}
-              style={{
-                position: "absolute",
-                left: "18px",
-                top: `${76 + idx * 112}px`, // Stacked: 76px, 188px, 300px
-                transform: "none",
-                background: isActive ? currentTheme.accentBg : "transparent",
-                border: isActive ? `2px solid ${currentTheme.accent}` : "2px solid transparent",
-                color: isActive ? currentTheme.accent : "rgba(255, 255, 255, 0.5)",
-                width: "72px",
-                height: "72px",
-                borderRadius: "16px",
-                cursor: "pointer",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "5px",
-                transition: "all 0.2s ease",
-                boxShadow: isActive ? `inset 0 0 6px ${currentTheme.accentBg}` : "none",
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.color = "#ffffff";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.color = "rgba(255, 255, 255, 0.5)";
-                  e.currentTarget.style.background = "transparent";
-                }
-              }}
-            >
-              <IconComponent size={26} style={{ filter: isActive ? `drop-shadow(0 0 4px ${currentTheme.accent})` : "none" }} />
-              <span style={{ fontSize: "10px", fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                {tab}
-              </span>
-            </button>
-          );
-        })}
-      </aside>
+      <Navbar
+        activeTab={activeTab}
+        colorMode={colorMode}
+        handleNavClick={handleNavClick}
+      />
 
       {/* Background Grid Pattern overlay */}
       <div
@@ -319,6 +287,7 @@ export default function About() {
       />
       <div style={{ position: "relative", zIndex: 1 }}>
         <div
+          id="about-section"
           className="main-content-wrapper"
           style={{
             width: "100%",
@@ -353,7 +322,7 @@ export default function About() {
           {/* Heading using Bitcount Grid Double & ShiningText */}
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             <h1
-              className="bitcount-text"
+              className="silkscreen-text"
               style={{
                 fontSize: "64px",
                 lineHeight: "1",
@@ -363,7 +332,7 @@ export default function About() {
                 textShadow: "0 0 15px rgba(255,255,255,0.2)",
               }}
             >
-              <ShiningText className="bitcount-text">Hap SreyPich</ShiningText>
+              <ShiningText className="silkscreen-text">Hap SreyPich</ShiningText>
             </h1>
             <p
               style={{
@@ -413,9 +382,6 @@ export default function About() {
 
           {/* Bottom dials / configuration buttons */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
-            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", fontFamily: "monospace", letterSpacing: "0.1em" }}>
-              CHANGE TERMINAL PALETTE:
-            </div>
             <div style={{ display: "flex", gap: "10px" }}>
               {["green", "cyan", "amber", "mono"].map((mode) => (
                 <button
@@ -541,7 +507,7 @@ export default function About() {
           {/* Selector Tabs (Integrated under the TV) */}
           {isMonitorOn && (
             <div style={{ display: "flex", gap: "10px" }}>
-              {["about", "skills", "projects"].map((tab) => (
+              {["about", "skills", "projects", "contact"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => {
@@ -568,7 +534,7 @@ export default function About() {
                     if (tvActiveTab !== tab) e.currentTarget.style.color = "rgba(255,255,255,0.5)";
                   }}
                 >
-                  {tab}
+                  {tab === "contact" ? "contact me" : tab}
                 </button>
               ))}
             </div>
@@ -578,6 +544,7 @@ export default function About() {
         </div>
         <Skill colorMode={colorMode} />
         <Projects colorMode={colorMode} />
+        <Contact colorMode={colorMode} />
       </div>
     </div>
   );

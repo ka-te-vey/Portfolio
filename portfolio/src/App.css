@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -25,6 +26,10 @@ body {
 
 .bitcount-text {
   font-family: 'Bitcount Single', system-ui, sans-serif !important;
+}
+
+.silkscreen-text {
+  font-family: 'Silkscreen', system-ui, sans-serif !important;
 }
 
 @keyframes shiny-text {
