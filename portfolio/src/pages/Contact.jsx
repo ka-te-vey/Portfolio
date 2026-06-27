@@ -113,6 +113,7 @@ export default function Contact({ colorMode = "green" }) {
   return (
     <div
       id="contact-section"
+      className="section-container"
       style={{
         width: "100%",
         minHeight: "550px",
@@ -121,7 +122,6 @@ export default function Contact({ colorMode = "green" }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "flex-start",
-        padding: "80px 40px",
         boxSizing: "border-box",
         position: "relative",
         overflow: "hidden",
@@ -169,7 +169,7 @@ export default function Contact({ colorMode = "green" }) {
           tag="h2"
           className="silkscreen-text"
           style={{
-            fontSize: "48px",
+            fontSize: "clamp(28px, 5vw, 48px)",
             lineHeight: "1.2",
             margin: 0,
             color: "#ffffff",

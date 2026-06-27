@@ -288,7 +288,7 @@ export default function About() {
       <div style={{ position: "relative", zIndex: 1 }}>
         <div
           id="about-section"
-          className="main-content-wrapper"
+          className="main-content-wrapper section-container"
           style={{
             width: "100%",
             minHeight: "750px",
@@ -296,7 +296,6 @@ export default function About() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "60px 40px",
             boxSizing: "border-box",
             position: "relative",
             overflow: "hidden",
@@ -317,14 +316,14 @@ export default function About() {
       >
         
         {/* ── LEFT COLUMN: COPY & BUTTONS ── */}
-        <div style={{ flex: "1 1 500px", display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div style={{ flex: "1 1 400px", display: "flex", flexDirection: "column", gap: "24px" }}>
 
           {/* Heading using Bitcount Grid Double & ShiningText */}
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             <h1
               className="silkscreen-text"
               style={{
-                fontSize: "64px",
+                fontSize: "clamp(36px, 8vw, 64px)",
                 lineHeight: "1",
                 margin: 0,
                 color: "#ffffff",
@@ -336,7 +335,7 @@ export default function About() {
             </h1>
             <p
               style={{
-                fontSize: "18px",
+                fontSize: "clamp(15px, 2vw, 18px)",
                 margin: 0,
                 color: "rgba(255,255,255,0.7)",
                 fontFamily: "sans-serif",
@@ -413,7 +412,7 @@ export default function About() {
         </div>
 
         {/* ── RIGHT COLUMN: CRT TERMINAL MONITOR ── */}
-        <div style={{ flex: "1 1 500px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "28px" }}>
+        <div style={{ flex: "1 1 400px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "28px" }}>
           
           <Television
             isTvOn={isMonitorOn}

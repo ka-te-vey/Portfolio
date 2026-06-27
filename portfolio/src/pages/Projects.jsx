@@ -129,10 +129,10 @@ export default function Projects({ colorMode = "green" }) {
       launchBtnText: "Wish",
     },
   ];
-
   return (
     <div
       id="projects-section"
+      className="section-container"
       style={{
         width: "100%",
         minHeight: "850px",
@@ -141,7 +141,6 @@ export default function Projects({ colorMode = "green" }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "flex-start",
-        padding: "80px 40px",
         boxSizing: "border-box",
         position: "relative",
         overflow: "hidden",
@@ -190,7 +189,7 @@ export default function Projects({ colorMode = "green" }) {
           tag="h2"
           className="silkscreen-text"
           style={{
-            fontSize: "48px",
+            fontSize: "clamp(28px, 5vw, 48px)",
             lineHeight: "1.2",
             margin: 0,
             color: "#ffffff",
@@ -243,6 +242,29 @@ export default function Projects({ colorMode = "green" }) {
             />
           ))}
         </CircularGallary>
+      </div>
+
+      {/* Scroll Hint (visible on mobile/tablet, hidden on desktop) */}
+      <div
+        className="projects-scroll-hint"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "12px",
+          marginTop: "16px",
+          color: currentTheme.accent,
+          fontFamily: "monospace",
+          fontSize: "12px",
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          opacity: 0.75,
+          zIndex: 2,
+        }}
+      >
+        <span className="hint-arrow-left">←</span>
+        <span>Swipe left / right to view projects</span>
+        <span className="hint-arrow-right">→</span>
       </div>
     </div>
   );

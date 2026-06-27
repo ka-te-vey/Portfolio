@@ -69,14 +69,14 @@ export default function CircularGallary({
     let cardWidth;
     let gap;
     if (viewportWidth < 600) {
-      cardWidth = Math.min(280, viewportWidth - 60);
-      gap = 20;
+      cardWidth = Math.min(320, viewportWidth - 40);
+      gap = 24;
     } else if (viewportWidth < 950) {
-      cardWidth = 300;
-      gap = 30;
+      cardWidth = 350;
+      gap = 32;
     } else {
-      cardWidth = 340;
-      gap = 40;
+      cardWidth = 390;
+      gap = 48;
     }
     return cardWidth + gap;
   }, [viewportWidth]);
@@ -135,13 +135,28 @@ export default function CircularGallary({
     if (!el) return;
 
     const onWheel = (e) => {
-      e.preventDefault();
-      scrollRef.current.target += e.deltaY * scrollSpeed * 0.4;
+      // Normalize deltas based on deltaMode
+      let dx = e.deltaX;
+      
+      if (e.deltaMode === 1) { // LINE mode
+        dx *= 40;
+      } else if (e.deltaMode === 2) { // PAGE mode
+        dx *= 800;
+      }
 
-      if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current);
-      wheelTimeoutRef.current = setTimeout(() => {
-        snapToNearest();
-      }, 200);
+      const absX = Math.abs(dx);
+      const absY = Math.abs(e.deltaY);
+
+      if (absX > absY && absX > 0) {
+        // Horizontal scroll is dominant (e.g. trackpad swipe left/right, Shift+mouse wheel)
+        e.preventDefault();
+        scrollRef.current.target += dx * scrollSpeed * 0.4;
+
+        if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current);
+        wheelTimeoutRef.current = setTimeout(() => {
+          snapToNearest();
+        }, 200);
+      }
     };
 
     el.addEventListener('wheel', onWheel, { passive: false });
@@ -166,14 +181,14 @@ export default function CircularGallary({
         let cardWidth;
         let gap;
         if (viewportWidth < 600) {
-          cardWidth = Math.min(280, viewportWidth - 60);
-          gap = 20;
+          cardWidth = Math.min(320, viewportWidth - 40);
+          gap = 24;
         } else if (viewportWidth < 950) {
-          cardWidth = 300;
-          gap = 30;
+          cardWidth = 350;
+          gap = 32;
         } else {
-          cardWidth = 340;
-          gap = 40;
+          cardWidth = 390;
+          gap = 48;
         }
 
         const width = cardWidth + gap;

@@ -91,6 +91,25 @@ const Shuffle = ({
     injectStyles();
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    let timeoutId;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setMeasured(false);
+        setCharSizes([]);
+      }, 150);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   const rolls = useMemo(() => Math.max(1, Math.floor(shuffleTimes)), [shuffleTimes]);
 
   useLayoutEffect(() => {
