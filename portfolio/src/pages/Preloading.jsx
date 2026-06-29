@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Television from "@/components/UI/Television.jsx";
+import Television from "@/components/ui/Television.jsx";
 import FuzzyText from "@/components/Font/FuzzyText.jsx";
 
 const injectStyles = () => {
