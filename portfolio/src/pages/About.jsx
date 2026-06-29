@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { ShiningText } from "@/components/Font/shining-text.jsx";
-import meImage from "@/assets/me.jpg";
-import Television from "@/components/ui/Television.jsx";
-import Navbar from "@/components/ui/Navbar.jsx";
+import { ShiningText } from "../components/Font/shining-text.jsx";
+import meImage from "../assets/me.jpg";
+import Television from "../components/ui/Television.jsx";
+import Navbar from "../components/ui/Navbar.jsx";
 import Skill from "./Skill.jsx";
 import Projects from "./Projects.jsx";
 import Contact from "./Contact.jsx";

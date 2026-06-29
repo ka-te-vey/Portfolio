@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import Television from "@/components/ui/Television.jsx";
-import FuzzyText from "@/components/Font/FuzzyText.jsx";
+import Television from "../components/ui/Television.jsx";
+import FuzzyText from "../components/Font/FuzzyText.jsx";
 
 const injectStyles = () => {
   const id = "preloader-tv-styles";

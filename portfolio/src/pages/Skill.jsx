@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import Card from "@/components/ui/Card.jsx";
-import Shuffle from "@/components/Font/Shuffle.jsx";
+import Card from "../components/ui/Card.jsx";
+import Shuffle from "../components/Font/Shuffle.jsx";
 import { 
   Monitor, Cpu, Terminal, Code2, GitBranch, 
   Atom, Palette, Code, PenTool, FileCode, 

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import Card from "@/components/ui/Card.jsx";
-import CircularGallary from "@/components/Effect/CircularGallary.jsx";
-import Shuffle from "@/components/Font/Shuffle.jsx";
+import Card from "../components/ui/Card.jsx";
+import CircularGallary from "../components/Effect/CircularGallary.jsx";
+import Shuffle from "../components/Font/Shuffle.jsx";
 
 export default function Projects({ colorMode = "green" }) {
   const containerRef = useRef(null);
