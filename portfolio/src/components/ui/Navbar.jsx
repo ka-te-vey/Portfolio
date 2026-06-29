@@ -89,12 +89,27 @@ export default function Navbar({
   ];
 
   return (
-    <div
-      ref={containerRef}
-      className={`fixed top-6 right-6 z-50 select-none transition-all duration-300 pointer-events-none flex flex-col items-end ${
-        isScrolling ? "opacity-0 -translate-y-4 scale-95" : "opacity-100 translate-y-0 scale-100"
-      }`}
-    >
+    <>
+      {/* ── FULL SCREEN BACKDROP BLUR OVERLAY ── */}
+      <div
+        className="fixed inset-0 z-40 transition-opacity duration-300"
+        style={{
+          background: "rgba(5, 12, 22, 0.45)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          opacity: isOpen ? 1 : 0,
+          pointerEvents: isOpen ? "auto" : "none",
+          transition: "opacity 0.25s ease",
+        }}
+        onClick={() => setIsOpen(false)}
+      />
+
+      <div
+        ref={containerRef}
+        className={`fixed top-6 right-6 z-50 select-none transition-all duration-300 pointer-events-none flex flex-col items-end ${
+          isScrolling ? "opacity-0 -translate-y-4 scale-95" : "opacity-100 translate-y-0 scale-100"
+        }`}
+      >
       {/* ── HAMBURGER TOGGLE BUTTON ── */}
       <button
         onClick={toggleMenu}
@@ -115,7 +130,7 @@ export default function Navbar({
 
       {/* ── DROPDOWN LIST ── */}
       <div
-        className="w-40 bg-[#101726]/85 backdrop-blur-lg border border-white/10 rounded-2xl p-2 shadow-2xl mt-2 flex flex-col gap-1.5"
+        className="w-44 bg-[#101726]/85 backdrop-blur-lg border border-white/10 rounded-2xl p-4 shadow-2xl mt-2 flex flex-col gap-2.5"
         style={{
           boxShadow: `0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 15px ${currentTheme.accent}15`,
           borderColor: `${currentTheme.accent}30`,
@@ -131,7 +146,7 @@ export default function Navbar({
           const isHovered = hoveredIndex === idx;
           const isItemActive = activeTab === item.label;
           const showHighlight = isItemActive || isHovered;
-
+ 
           return (
             <button
               key={idx}
@@ -141,7 +156,7 @@ export default function Navbar({
               }}
               onMouseEnter={() => setHoveredIndex(idx)}
               onMouseLeave={() => setHoveredIndex(null)}
-              className="w-full flex items-center gap-3 rounded-xl h-9 px-3 transition-all duration-200 cursor-pointer border border-transparent select-none active:scale-98"
+              className="w-full flex items-center gap-3 rounded-xl h-11 px-4 transition-all duration-200 cursor-pointer border border-transparent select-none active:scale-98"
               style={{
                 background: showHighlight ? currentTheme.bg : "transparent",
                 borderColor: isItemActive ? `${currentTheme.accent}40` : "transparent",
@@ -168,5 +183,6 @@ export default function Navbar({
         })}
       </div>
     </div>
-  );
+  </>
+);
 }

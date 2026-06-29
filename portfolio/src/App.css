@@ -258,4 +258,11 @@ body {
 .reveal-card.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Mobile space between heading and floating navbar button */
+@media (max-width: 640px) {
+  #about-section {
+    padding-top: 120px !important;
+  }
 }

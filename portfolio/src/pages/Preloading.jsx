@@ -66,11 +66,31 @@ export default function Preloading({ onComplete }) {
   const [knob2Rot, setKnob2Rot] = useState(0);
   const [isAntennaExtended, setIsAntennaExtended] = useState(true);
   const [isZooming, setIsZooming] = useState(false);
+  const [tvScale, setTvScale] = useState(1);
 
   useEffect(() => {
     injectStyles();
     const t = setTimeout(() => setShowText(true), 800);
-    return () => clearTimeout(t);
+
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const maxTvWidth = 560;
+      const margin = 32; // 16px padding on left/right for mobile
+      const availableWidth = width - margin;
+
+      if (availableWidth < maxTvWidth) {
+        setTvScale(availableWidth / maxTvWidth);
+      } else {
+        setTvScale(1);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const colorPalettes = {
@@ -161,55 +181,74 @@ export default function Preloading({ onComplete }) {
         pointerEvents: "none",
       }} />
 
-      <Television
-        colorMode={colorMode}
-        isTvOn={isTvOn}
-        isZooming={isZooming}
-        isAntennaExtended={isAntennaExtended}
-        knob1Rot={knob1Rot}
-        knob2Rot={knob2Rot}
-        handleKnob1Click={handleKnob1Click}
-        handleKnob2Click={handleKnob2Click}
-        handleAntennaClick={handleAntennaClick}
-        handleAntennaWheel={handleAntennaWheel}
-        handleScreenClick={() => {
-          if (!isTvOn) {
-            setIsTvOn(true);
-            return;
-          }
-          setIsZooming(true);
-          setTimeout(() => {
-            if (onComplete) onComplete();
-          }, 1200);
-        }}
-        currentPalette={currentPalette}
-      >
-        {/* Welcome text using FuzzyText */}
-        {isTvOn && showText && (
-          <div
-            className="tv-text-anim"
-            style={{
-              position: "absolute", inset: 0, zIndex: 4,
-              display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center",
-              gap: "0px",
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: `${560 * tvScale}px`,
+        height: `${440 * tvScale}px`,
+        overflow: "visible",
+        transition: "width 0.2s ease, height 0.2s ease",
+      }}>
+        <div style={{
+          transform: `scale(${tvScale})`,
+          transformOrigin: "center center",
+          flexShrink: 0,
+          width: "560px",
+          display: "flex",
+          justifyContent: "center",
+        }}>
+          <Television
+            colorMode={colorMode}
+            isTvOn={isTvOn}
+            isZooming={isZooming}
+            isAntennaExtended={isAntennaExtended}
+            knob1Rot={knob1Rot}
+            knob2Rot={knob2Rot}
+            handleKnob1Click={handleKnob1Click}
+            handleKnob2Click={handleKnob2Click}
+            handleAntennaClick={handleAntennaClick}
+            handleAntennaWheel={handleAntennaWheel}
+            handleScreenClick={() => {
+              if (!isTvOn) {
+                setIsTvOn(true);
+                return;
+              }
+              setIsZooming(true);
+              setTimeout(() => {
+                if (onComplete) onComplete();
+              }, 1200);
             }}
+            currentPalette={currentPalette}
           >
-            <FuzzyText
-              fontSize="28px"
-              fontWeight={700}
-              fontFamily="'Creepster', system-ui, sans-serif"
-              color="#ffffff"
-              baseIntensity={0.2}
-              hoverIntensity={0.5}
-              enableHover={true}
-              fuzzRange={10}
-            >
-              Welcome to my Portfolio
-            </FuzzyText>
-          </div>
-        )}
-      </Television>
+            {/* Welcome text using FuzzyText */}
+            {isTvOn && showText && (
+              <div
+                className="tv-text-anim"
+                style={{
+                  position: "absolute", inset: 0, zIndex: 4,
+                  display: "flex", flexDirection: "column",
+                  alignItems: "center", justifyContent: "center",
+                  gap: "0px",
+                }}
+              >
+                <FuzzyText
+                  fontSize="28px"
+                  fontWeight={700}
+                  fontFamily="'Creepster', system-ui, sans-serif"
+                  color="#ffffff"
+                  baseIntensity={0.2}
+                  hoverIntensity={0.5}
+                  enableHover={true}
+                  fuzzRange={10}
+                >
+                  Welcome to my Portfolio
+                </FuzzyText>
+              </div>
+            )}
+          </Television>
+        </div>
+      </div>
     </div>
   );
 }

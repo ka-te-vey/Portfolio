@@ -55,6 +55,25 @@ export default function About() {
   const [knob1Rot, setKnob1Rot] = useState(0);
   const [knob2Rot, setKnob2Rot] = useState(0);
   const [isAntennaExtended, setIsAntennaExtended] = useState(true);
+  const [tvScale, setTvScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const maxTvWidth = 560;
+      const margin = 32; // 16px padding on left/right for mobile
+      const availableWidth = width - margin;
+
+      if (availableWidth < maxTvWidth) {
+        setTvScale(availableWidth / maxTvWidth);
+      } else {
+        setTvScale(1);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleKnob1Click = () => {
     const modes = ["green", "cyan", "amber", "mono"];
@@ -414,98 +433,118 @@ export default function About() {
         {/* ── RIGHT COLUMN: CRT TERMINAL MONITOR ── */}
         <div style={{ flex: "1 1 400px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "28px" }}>
           
-          <Television
-            isTvOn={isMonitorOn}
-            isZooming={false}
-            isAntennaExtended={isAntennaExtended}
-            knob1Rot={knob1Rot}
-            knob2Rot={knob2Rot}
-            handleKnob1Click={handleKnob1Click}
-            handleKnob2Click={handleKnob2Click}
-            handleAntennaClick={handleAntennaClick}
-            handleAntennaWheel={handleAntennaWheel}
-            handleScreenClick={() => {
-              if (!isMonitorOn) {
-                setIsMonitorOn(true);
-              }
-            }}
-            currentPalette={{
-              glow1: currentTheme.glow1,
-              glow2: currentTheme.glow2,
-              screenBg: currentTheme.screenBg,
-            }}
-          >
-            {/* Vintage Snow Static Noise */}
-            {isMonitorOn && <div className="tv-static-noise" style={{ opacity: 0.1 }} />}
-
-
-            {/* Screen Interactive Terminal Logs */}
-            {isMonitorOn ? (
-              <div
-                style={{
-                  padding: "16px 16px 16px 16px",
-                  height: "100%",
-                  boxSizing: "border-box",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  fontFamily: "monospace",
-                  fontSize: "12px",
-                  lineHeight: "1.45",
-                  color: currentTheme.text,
-                  whiteSpace: "pre-wrap",
-                  overflowY: "auto",
+          <div style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: `${560 * tvScale}px`,
+            height: `${440 * tvScale}px`,
+            overflow: "visible",
+            transition: "width 0.2s ease, height 0.2s ease",
+          }}>
+            <div style={{
+              transform: `scale(${tvScale})`,
+              transformOrigin: "center center",
+              flexShrink: 0,
+              width: "560px",
+              display: "flex",
+              justifyContent: "center",
+            }}>
+              <Television
+                isTvOn={isMonitorOn}
+                isZooming={false}
+                isAntennaExtended={isAntennaExtended}
+                knob1Rot={knob1Rot}
+                knob2Rot={knob2Rot}
+                handleKnob1Click={handleKnob1Click}
+                handleKnob2Click={handleKnob2Click}
+                handleAntennaClick={handleAntennaClick}
+                handleAntennaWheel={handleAntennaWheel}
+                handleScreenClick={() => {
+                  if (!isMonitorOn) {
+                    setIsMonitorOn(true);
+                  }
+                }}
+                currentPalette={{
+                  glow1: currentTheme.glow1,
+                  glow2: currentTheme.glow2,
+                  screenBg: currentTheme.screenBg,
                 }}
               >
-                {terminalText}
-                {/* Blinking Cursor */}
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: "8px",
-                    height: "12px",
-                    background: currentTheme.text,
-                    marginLeft: "4px",
-                    animation: "blink-anim 0.8s infinite steps(2)",
-                  }}
-                />
-              </div>
-            ) : (
-              <>
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    backgroundImage: `url(${meImage})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    opacity: 0.95,
-                    filter: "brightness(95%) contrast(100%)",
-                    transition: "opacity 0.5s ease",
-                  }}
-                />
-                {/* Screen OFF pattern (faint phosphor dot in center) */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "4px",
-                    height: "4px",
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.05)",
-                    boxShadow: "0 0 10px rgba(255,255,255,0.05)",
-                    zIndex: 1,
-                  }}
-                />
-              </>
-            )}
-          </Television>
+                {/* Vintage Snow Static Noise */}
+                {isMonitorOn && <div className="tv-static-noise" style={{ opacity: 0.1 }} />}
+
+
+                {/* Screen Interactive Terminal Logs */}
+                {isMonitorOn ? (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      padding: "16px",
+                      boxSizing: "border-box",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-start",
+                      fontFamily: "monospace",
+                      fontSize: "12px",
+                      lineHeight: "1.45",
+                      color: currentTheme.text,
+                      whiteSpace: "pre-wrap",
+                      overflowY: "auto",
+                    }}
+                  >
+                    {terminalText}
+                    {/* Blinking Cursor */}
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: "8px",
+                        height: "12px",
+                        background: currentTheme.text,
+                        marginLeft: "4px",
+                        animation: "blink-anim 0.8s infinite steps(2)",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        backgroundImage: `url(${meImage})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        opacity: 0.95,
+                        filter: "brightness(95%) contrast(100%)",
+                        transition: "opacity 0.5s ease",
+                      }}
+                    />
+                    {/* Screen OFF pattern (faint phosphor dot in center) */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: "4px",
+                        height: "4px",
+                        borderRadius: "50%",
+                        background: "rgba(255,255,255,0.05)",
+                        boxShadow: "0 0 10px rgba(255,255,255,0.05)",
+                        zIndex: 1,
+                      }}
+                    />
+                  </>
+                )}
+              </Television>
+            </div>
+          </div>
 
           {/* Selector Tabs (Integrated under the TV) */}
           {isMonitorOn && (
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
               {["about", "skills", "projects", "contact"].map((tab) => (
                 <button
                   key={tab}
