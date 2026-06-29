@@ -1,4 +1,4 @@
-import { CometCard } from "@/components/ui/comet-card.jsx";
+import { CometCard } from "@/components/Font/comet-card.jsx";
 
 export default function Card({
   title,
@@ -52,7 +52,7 @@ export default function Card({
   const currentTheme = colorPalettes[colorMode] || colorPalettes.green;
 
   return (
-    <CometCard className="flex-1 min-w-[320px] max-w-[380px]">
+    <CometCard className="flex-1 min-w-0 w-full max-w-[440px]">
       <div
         style={{
           width: "100%",

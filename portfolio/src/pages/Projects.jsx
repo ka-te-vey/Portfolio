@@ -1,7 +1,35 @@
-import { ShiningText } from "@/components/ui/shining-text.jsx";
-import Card from "@/components/ui/Card.jsx";
+import { useEffect, useRef } from "react";
+import Card from "@/components/UI/Card.jsx";
+import CircularGallary from "@/components/Effect/CircularGallary.jsx";
+import Shuffle from "@/components/Font/Shuffle.jsx";
 
 export default function Projects({ colorMode = "green" }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          } else {
+            entry.target.classList.remove("visible");
+          }
+        });
+      },
+      {
+        threshold: 0.05,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    const cards = containerRef.current?.querySelectorAll(".reveal-card");
+    cards?.forEach((card) => observer.observe(card));
+
+    return () => {
+      cards?.forEach((card) => observer.unobserve(card));
+    };
+  }, []);
   const colorPalettes = {
     cyan: {
       accent: "rgba(6,182,212,1)",
@@ -77,7 +105,7 @@ export default function Projects({ colorMode = "green" }) {
       launchBtnText: "Weather-App",
     },
     {
-      title: "Doc Genz",
+      title: "Doc Gen",
       subtitle: "PDF Document Generator",
       description: "A full-stack document generator featuring markdown compilation, real-time previewing, and PDF conversion using jspdf and html2canvas with a dual-prefix dev layout.",
       tech: ["React 19", "jspdf", "html2canvas", "NodeJS"],
@@ -101,10 +129,10 @@ export default function Projects({ colorMode = "green" }) {
       launchBtnText: "Wish",
     },
   ];
-
   return (
     <div
       id="projects-section"
+      className="section-container"
       style={{
         width: "100%",
         minHeight: "850px",
@@ -113,24 +141,12 @@ export default function Projects({ colorMode = "green" }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "flex-start",
-        padding: "80px 40px",
         boxSizing: "border-box",
         position: "relative",
         overflow: "hidden",
+        scrollMarginTop: "80px",
       }}
     >
-      {/* Scanline overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%)",
-          backgroundSize: "100% 4px",
-          pointerEvents: "none",
-          zIndex: 2,
-          opacity: 0.4,
-        }}
-      />
 
       {/* Header */}
       <div
@@ -168,19 +184,23 @@ export default function Projects({ colorMode = "green" }) {
           </span>
         </div>
 
-        <h2
-          className="bitcount-text"
+        <Shuffle
+          text="Projects Library"
+          tag="h2"
+          className="silkscreen-text"
           style={{
-            fontSize: "48px",
+            fontSize: "clamp(28px, 5vw, 48px)",
             lineHeight: "1.2",
             margin: 0,
             color: "#ffffff",
             letterSpacing: "0.05em",
             textShadow: "0 0 15px rgba(255,255,255,0.15)",
           }}
-        >
-          <ShiningText className="bitcount-text">Projects Library</ShiningText>
-        </h2>
+          shuffleDirection="right"
+          duration={0.5}
+          stagger={0.03}
+          scrambleCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%#$@*"
+        />
         <p
           style={{
             fontSize: "14px",
@@ -188,31 +208,63 @@ export default function Projects({ colorMode = "green" }) {
             fontFamily: "monospace",
             maxWidth: "500px",
             margin: 0,
+            lineHeight: "1.5",
+            fontWeight: 500,
           }}
         >
           Accessing active deployment pipelines. High priority targets rendered below.
         </p>
       </div>
 
-      {/* Projects Grid */}
+      {/* Projects Circular Gallery */}
       <div
         style={{
-          display: "flex",
           maxWidth: "1100px",
           width: "100%",
-          gap: "30px",
+          height: "600px",
           zIndex: 1,
-          flexWrap: "wrap",
+          display: "flex",
           justifyContent: "center",
+          alignItems: "center",
+          marginTop: "20px",
         }}
       >
-        {projectList.map((proj, idx) => (
-          <Card
-            key={idx}
-            colorMode={colorMode}
-            {...proj}
-          />
-        ))}
+        <CircularGallary
+          bend={3}
+          scrollSpeed={1.5}
+          scrollEase={0.08}
+        >
+          {projectList.map((proj, idx) => (
+            <Card
+              key={idx}
+              colorMode={colorMode}
+              {...proj}
+            />
+          ))}
+        </CircularGallary>
+      </div>
+
+      {/* Scroll Hint (visible on mobile/tablet, hidden on desktop) */}
+      <div
+        className="projects-scroll-hint"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "12px",
+          marginTop: "16px",
+          color: currentTheme.accent,
+          fontFamily: "monospace",
+          fontSize: "12px",
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          opacity: 0.75,
+          zIndex: 2,
+        }}
+      >
+        <span className="hint-arrow-left">←</span>
+        <span>Swipe left / right to view projects</span>
+        <span className="hint-arrow-right">→</span>
       </div>
     </div>
   );

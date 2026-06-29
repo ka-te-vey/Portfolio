@@ -109,3 +109,68 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Projects Scroll Hint on Responsive Mobile/Tablet */
+.projects-scroll-hint {
+  display: flex !important;
+}
+
+@media (min-width: 1025px) {
+  .projects-scroll-hint {
+    display: none !important;
+  }
+}
+
+@keyframes slideLeft {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-4px); }
+}
+
+@keyframes slideRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+
+.hint-arrow-left {
+  display: inline-block;
+  animation: slideLeft 1.5s ease-in-out infinite;
+}
+
+.hint-arrow-right {
+  display: inline-block;
+  animation: slideRight 1.5s ease-in-out infinite;
+}
+
+/* Responsive Section Containers */
+.section-container {
+  padding: 80px 40px;
+}
+
+@media (max-width: 640px) {
+  .section-container {
+    padding: 60px 16px !important;
+  }
+}
+
+/* Skill Cards Responsiveness - Matches Projects Card Sizing */
+.skill-card-wrapper {
+  display: flex;
+  flex: 1 1 320px;
+  max-width: 380px;
+  justify-content: center;
+}
+
+@media (max-width: 950px) {
+  .skill-card-wrapper {
+    flex: 0 0 350px !important;
+    max-width: 350px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .skill-card-wrapper {
+    flex: 0 0 calc(100vw - 72px) !important;
+    width: calc(100vw - 72px) !important;
+    max-width: 320px !important;
+  }
+}

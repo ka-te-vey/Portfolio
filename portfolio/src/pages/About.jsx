@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
-import { ShiningText } from "@/components/ui/shining-text.jsx";
+import { ShiningText } from "@/components/Font/shining-text.jsx";
 import meImage from "@/assets/me.jpg";
+import Television from "@/components/UI/Television.jsx";
+import Navbar from "@/components/UI/Navbar.jsx";
+import Skill from "./Skill.jsx";
+import Projects from "./Projects.jsx";
+import Contact from "./Contact.jsx";
 
 const TERMINAL_CONTENT = {
   about: `> Fetching identity...
@@ -29,16 +34,132 @@ VERSION CONTROL:
 3. Weather App
 4. Doc Genz
 5. Wish For Fun`,
+
+  contact: `> Initializing message gateway...
+[READY] Secure Channel Established.
+
+CONTACT PORTAL:
+- EMAIL: oscar19092019@gmail.com
+- GITHUB: github.com/ka-te-vey
+- LINKEDIN: linkedin.com/in/hap-sreypich-b38852390/
+
+Status: Awaiting transmission...`,
 };
 
-import Skill from "./Skill.jsx";
-import Projects from "./Projects.jsx";
-
 export default function About() {
-  const [activeTab, setActiveTab] = useState("about"); // "about", "skills", "projects"
+  const [activeTab, setActiveTab] = useState("about"); // "about", "skills", "projects", "contact"
+  const [tvActiveTab, setTvActiveTab] = useState("about"); // "about", "skills", "projects", "contact" for TV screen
   const [colorMode, setColorMode] = useState("green"); // "cyan", "amber", "green", "mono"
   const [isMonitorOn, setIsMonitorOn] = useState(false);
   const [terminalText, setTerminalText] = useState("");
+  const [knob1Rot, setKnob1Rot] = useState(0);
+  const [knob2Rot, setKnob2Rot] = useState(0);
+  const [isAntennaExtended, setIsAntennaExtended] = useState(true);
+  const [tvScale, setTvScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const maxTvWidth = 560;
+      const margin = 32; // 16px padding on left/right for mobile
+      const availableWidth = width - margin;
+
+      if (availableWidth < maxTvWidth) {
+        setTvScale(availableWidth / maxTvWidth);
+      } else {
+        setTvScale(1);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const handleKnob1Click = () => {
+    const modes = ["green", "cyan", "amber", "mono"];
+    const nextIndex = (modes.indexOf(colorMode) + 1) % modes.length;
+    setColorMode(modes[nextIndex]);
+    setKnob1Rot((prev) => prev + 90);
+  };
+
+  const handleKnob2Click = () => {
+    setIsMonitorOn((prev) => !prev);
+    setKnob2Rot((prev) => (prev === 0 ? 45 : 0));
+  };
+
+  const handleAntennaClick = () => {
+    setIsAntennaExtended((prev) => !prev);
+  };
+
+  const handleAntennaWheel = (e) => {
+    if (e.deltaY < 0) {
+      setIsAntennaExtended(true);
+    } else {
+      setIsAntennaExtended(false);
+    }
+  };
+
+  const handleNavClick = (tab) => {
+    setActiveTab(tab);
+    setTvActiveTab(tab);
+    if (!isMonitorOn) {
+      setIsMonitorOn(true);
+    }
+    if (tab === "about") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (tab === "skills") {
+      document.getElementById("skills-section")?.scrollIntoView({ behavior: "smooth" });
+    } else if (tab === "projects") {
+      document.getElementById("projects-section")?.scrollIntoView({ behavior: "smooth" });
+    } else if (tab === "contact") {
+      document.getElementById("contact-section")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+      if (isAtBottom) {
+        setActiveTab("contact");
+        setTvActiveTab("contact");
+        return;
+      }
+
+      const sections = [
+        { id: "about", el: document.getElementById("about-section") },
+        { id: "skills", el: document.getElementById("skills-section") },
+        { id: "projects", el: document.getElementById("projects-section") },
+        { id: "contact", el: document.getElementById("contact-section") },
+      ];
+
+      let currentSection = "about";
+      let minDistance = Infinity;
+
+      sections.forEach((sec) => {
+        if (sec.el) {
+          const rect = sec.el.getBoundingClientRect();
+          const distance = Math.abs(rect.top - 150);
+          if (distance < minDistance) {
+            minDistance = distance;
+            currentSection = sec.id;
+          }
+        }
+      });
+
+      setActiveTab(currentSection);
+      setTvActiveTab(currentSection);
+    };
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+
 
   const colorPalettes = {
     cyan: {
@@ -47,7 +168,9 @@ export default function About() {
       text: "#b6e3f4",
       screenBg: "#061521",
       glow: "0 0 20px rgba(6,182,212,0.45)",
-      terminalHeader: "Cyan Terminal v4.1",
+      glow1: "rgba(6,182,212,0.35)",
+      glow2: "rgba(6,182,212,0.18)",
+      panelBorder: "rgba(6,182,212,0.3)",
     },
     amber: {
       accent: "rgba(245,158,11,1)", // Tailwind amber-500
@@ -55,7 +178,9 @@ export default function About() {
       text: "#fde68a",
       screenBg: "#1a1202",
       glow: "0 0 20px rgba(245,158,11,0.45)",
-      terminalHeader: "Amber Terminal v4.1",
+      glow1: "rgba(245,158,11,0.35)",
+      glow2: "rgba(245,158,11,0.18)",
+      panelBorder: "rgba(245,158,11,0.3)",
     },
     green: {
       accent: "rgba(34,197,94,1)", // Tailwind green-500
@@ -63,7 +188,9 @@ export default function About() {
       text: "#bbf7d0",
       screenBg: "#05180c",
       glow: "0 0 20px rgba(34,197,94,0.45)",
-      terminalHeader: "Green Matrix Terminal v4.1",
+      glow1: "rgba(34,197,94,0.35)",
+      glow2: "rgba(34,197,94,0.18)",
+      panelBorder: "rgba(34,197,94,0.3)",
     },
     mono: {
       accent: "rgba(226,232,240,1)", // Tailwind slate-200
@@ -71,7 +198,9 @@ export default function About() {
       text: "#f1f5f9",
       screenBg: "#0f172a",
       glow: "0 0 20px rgba(226,232,240,0.3)",
-      terminalHeader: "Monochrome Terminal v4.1",
+      glow1: "rgba(226,232,240,0.3)",
+      glow2: "rgba(226,232,240,0.15)",
+      panelBorder: "rgba(226,232,240,0.2)",
     },
   };
 
@@ -81,7 +210,7 @@ export default function About() {
   useEffect(() => {
     if (!isMonitorOn) return;
     let index = 0;
-    const fullText = TERMINAL_CONTENT[activeTab];
+    const fullText = TERMINAL_CONTENT[tvActiveTab];
 
     const interval = setInterval(() => {
       if (index === 0) {
@@ -96,7 +225,7 @@ export default function About() {
     }, 12);
 
     return () => clearInterval(interval);
-  }, [activeTab, isMonitorOn]);
+  }, [tvActiveTab, isMonitorOn]);
 
   return (
     <div
@@ -104,14 +233,67 @@ export default function About() {
         width: "100%",
         minHeight: "100vh",
         background: "linear-gradient(160deg, #0b2236 0%, #0d2a3a 40%, #071a28 100%)",
+        backgroundAttachment: "fixed",
         position: "relative",
         overflowX: "hidden",
       }}
     >
+      {/* Responsive Styles for Sidebar */}
+      <style>{`
+        @media (max-width: 1024px) {
+          .glass-sidebar {
+            position: fixed !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            top: auto !important;
+            width: 100% !important;
+            height: 64px !important;
+            transform: none !important;
+            flex-direction: row !important;
+            justify-content: center !important;
+            gap: 40px !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            border-top: 1.5px solid var(--panel-border) !important;
+            border-left: none !important;
+            border-right: none !important;
+            border-bottom: none !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            box-shadow: none !important;
+          }
+          .glass-sidebar button {
+            position: static !important;
+            transform: none !important;
+            width: auto !important;
+            height: 100% !important;
+            padding: 0 16px !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+          .glass-sidebar-glow {
+            display: none !important;
+          }
+        }
+        @media (min-width: 1025px) {
+          .main-content-wrapper {
+            padding-right: 0px !important;
+            padding-left: 0px !important;
+          }
+        }
+      `}</style>
+
+      <Navbar
+        activeTab={activeTab}
+        colorMode={colorMode}
+        handleNavClick={handleNavClick}
+      />
+
       {/* Background Grid Pattern overlay */}
       <div
         style={{
-          position: "absolute",
+          position: "fixed",
           inset: 0,
           backgroundImage: `
             linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
@@ -124,6 +306,8 @@ export default function About() {
       />
       <div style={{ position: "relative", zIndex: 1 }}>
         <div
+          id="about-section"
+          className="main-content-wrapper section-container"
           style={{
             width: "100%",
             minHeight: "750px",
@@ -131,7 +315,6 @@ export default function About() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "60px 40px",
             boxSizing: "border-box",
             position: "relative",
             overflow: "hidden",
@@ -152,14 +335,14 @@ export default function About() {
       >
         
         {/* ── LEFT COLUMN: COPY & BUTTONS ── */}
-        <div style={{ flex: "1 1 500px", display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div style={{ flex: "1 1 400px", display: "flex", flexDirection: "column", gap: "24px" }}>
 
           {/* Heading using Bitcount Grid Double & ShiningText */}
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             <h1
-              className="bitcount-text"
+              className="silkscreen-text"
               style={{
-                fontSize: "64px",
+                fontSize: "clamp(36px, 8vw, 64px)",
                 lineHeight: "1",
                 margin: 0,
                 color: "#ffffff",
@@ -167,11 +350,11 @@ export default function About() {
                 textShadow: "0 0 15px rgba(255,255,255,0.2)",
               }}
             >
-              <ShiningText className="bitcount-text">Hap SreyPich</ShiningText>
+              <ShiningText className="silkscreen-text">Hap SreyPich</ShiningText>
             </h1>
             <p
               style={{
-                fontSize: "18px",
+                fontSize: "clamp(15px, 2vw, 18px)",
                 margin: 0,
                 color: "rgba(255,255,255,0.7)",
                 fontFamily: "sans-serif",
@@ -217,9 +400,6 @@ export default function About() {
 
           {/* Bottom dials / configuration buttons */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
-            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", fontFamily: "monospace", letterSpacing: "0.1em" }}>
-              CHANGE TERMINAL PALETTE:
-            </div>
             <div style={{ display: "flex", gap: "10px" }}>
               {["green", "cyan", "amber", "mono"].map((mode) => (
                 <button
@@ -251,118 +431,57 @@ export default function About() {
         </div>
 
         {/* ── RIGHT COLUMN: CRT TERMINAL MONITOR ── */}
-        <div style={{ flex: "1 1 450px", display: "flex", justifyContent: "center" }}>
+        <div style={{ flex: "1 1 400px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "28px" }}>
           
-          {/* Outer monitor cabinet frame */}
-          <div
-            style={{
-              width: "100%",
-              maxWidth: "480px",
-              background: "linear-gradient(135deg, #2e3a47 0%, #1e2630 60%, #121820 100%)",
-              borderRadius: "16px",
-              padding: "16px 16px 24px 16px",
-              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8), inset 0 2px 2px rgba(255,255,255,0.1)",
-              border: "1.5px solid #0d1217",
-              position: "relative",
-            }}
-          >
-            {/* Monitor Brand Label */}
-            <div
-              style={{
-                fontSize: "10px",
-                color: "rgba(255,255,255,0.2)",
-                fontFamily: "monospace",
-                textAlign: "center",
-                marginBottom: "10px",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-              }}
-            >
-              HEXTA MONITOR // MODEL C-88
-            </div>
-
-            {/* Inner Monitor Bezel */}
-            <div
-              style={{
-                background: "#0c1117",
-                borderRadius: "10px",
-                padding: "8px",
-                boxShadow: "inset 0 4px 12px rgba(0,0,0,0.9)",
-              }}
-            >
-              {/* Screen Area Container */}
-              <div
-                className={isMonitorOn ? "tv-bad-signal" : ""}
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  aspectRatio: "4 / 3",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  background: isMonitorOn ? currentTheme.screenBg : "#030406",
-                  transition: "background 0.3s ease",
-                  boxShadow: isMonitorOn ? undefined : "inset 0 0 20px rgba(0,0,0,0.95)",
+          <div style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: `${560 * tvScale}px`,
+            height: `${440 * tvScale}px`,
+            overflow: "visible",
+            transition: "width 0.2s ease, height 0.2s ease",
+          }}>
+            <div style={{
+              transform: `scale(${tvScale})`,
+              transformOrigin: "center center",
+              flexShrink: 0,
+              width: "560px",
+              display: "flex",
+              justifyContent: "center",
+            }}>
+              <Television
+                isTvOn={isMonitorOn}
+                isZooming={false}
+                isAntennaExtended={isAntennaExtended}
+                knob1Rot={knob1Rot}
+                knob2Rot={knob2Rot}
+                handleKnob1Click={handleKnob1Click}
+                handleKnob2Click={handleKnob2Click}
+                handleAntennaClick={handleAntennaClick}
+                handleAntennaWheel={handleAntennaWheel}
+                handleScreenClick={() => {
+                  if (!isMonitorOn) {
+                    setIsMonitorOn(true);
+                  }
+                }}
+                currentPalette={{
+                  glow1: currentTheme.glow1,
+                  glow2: currentTheme.glow2,
+                  screenBg: currentTheme.screenBg,
                 }}
               >
                 {/* Vintage Snow Static Noise */}
                 {isMonitorOn && <div className="tv-static-noise" style={{ opacity: 0.1 }} />}
 
-                {/* Scanline pattern overlay */}
-                {isMonitorOn && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))",
-                      backgroundSize: "100% 3px, 6px 100%",
-                      pointerEvents: "none",
-                      zIndex: 3,
-                    }}
-                  />
-                )}
-
-                {/* CRT corner vignette */}
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(0,0,0,0.4) 100%)",
-                    pointerEvents: "none",
-                    zIndex: 3,
-                  }}
-                />
-
-                {/* Terminal Header Info */}
-                {isMonitorOn && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      background: "rgba(0,0,0,0.3)",
-                      padding: "6px 12px",
-                      borderBottom: `1px solid ${currentTheme.accentBg}`,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      zIndex: 2,
-                      fontFamily: "monospace",
-                      fontSize: "9px",
-                      color: currentTheme.accent,
-                    }}
-                  >
-                    <span>{currentTheme.terminalHeader}</span>
-                    <span style={{ opacity: 0.7 }}>Baud: 9600</span>
-                  </div>
-                )}
 
                 {/* Screen Interactive Terminal Logs */}
                 {isMonitorOn ? (
                   <div
                     style={{
-                      padding: "36px 16px 16px 16px",
-                      height: "100%",
+                      position: "absolute",
+                      inset: 0,
+                      padding: "16px",
                       boxSizing: "border-box",
                       display: "flex",
                       flexDirection: "column",
@@ -419,123 +538,51 @@ export default function About() {
                     />
                   </>
                 )}
-              </div>
-            </div>
-
-            {/* Monitor Control Bar (Power light, Power Button, Dials) */}
-            <div
-              style={{
-                display: "flex",
-                marginTop: "16px",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0 8px",
-              }}
-            >
-              {/* Power LED & Dial controls */}
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                {/* Glowing LED Power Light */}
-                <div
-                  style={{
-                    width: "6px",
-                    height: "6px",
-                    borderRadius: "50%",
-                    background: isMonitorOn ? "#39ff14" : "#ff073a",
-                    boxShadow: isMonitorOn ? "0 0 8px #39ff14" : "0 0 8px #ff073a",
-                    transition: "background 0.3s ease, box-shadow 0.3s ease",
-                  }}
-                />
-
-                {/* Subtitle / Mode label */}
-                <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.3)", fontFamily: "monospace", letterSpacing: "0.1em" }}>
-                  POWER {isMonitorOn ? "ON" : "OFF"}
-                </span>
-              </div>
-
-              {/* Selector Tabs (Integrated in monitor control dial style) */}
-              {isMonitorOn && (
-                <div style={{ display: "flex", gap: "6px" }}>
-                  {["about", "skills", "projects"].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => {
-                        setActiveTab(tab);
-                        if (tab === "skills") {
-                          document.getElementById("skills-section")?.scrollIntoView({ behavior: "smooth" });
-                        } else if (tab === "projects") {
-                          document.getElementById("projects-section")?.scrollIntoView({ behavior: "smooth" });
-                        } else if (tab === "about") {
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }
-                      }}
-                      style={{
-                        background: activeTab === tab ? currentTheme.accent : "#1e2630",
-                        border: "1px solid #0d1217",
-                        borderRadius: "4px",
-                        padding: "4px 8px",
-                        color: activeTab === tab ? (colorMode === "mono" ? "#0f172a" : "#000") : "rgba(255,255,255,0.5)",
-                        fontSize: "9px",
-                        fontWeight: 700,
-                        fontFamily: "monospace",
-                        cursor: "pointer",
-                        textTransform: "uppercase",
-                        boxShadow: activeTab === tab ? "0 0 6px rgba(255,255,255,0.15)" : "none",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (activeTab !== tab) e.currentTarget.style.color = "#ffffff";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (activeTab !== tab) e.currentTarget.style.color = "rgba(255,255,255,0.5)";
-                      }}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Monitor Power Button */}
-              <button
-                onClick={() => setIsMonitorOn((prev) => !prev)}
-                style={{
-                  width: "28px",
-                  height: "28px",
-                  borderRadius: "50%",
-                  background: isMonitorOn
-                    ? "radial-gradient(circle at 35% 35%, #2a3543 0%, #171d24 100%)"
-                    : "radial-gradient(circle at 35% 35%, #46556b 0%, #222b37 100%)",
-                  border: "1.5px solid #0c1117",
-                  boxShadow: "0 2px 5px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  outline: "none",
-                  transition: "transform 0.1s ease",
-                }}
-                onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.92)")}
-                onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              >
-                {/* Power Icon glyph */}
-                <span
-                  style={{
-                    fontSize: "8px",
-                    color: isMonitorOn ? "rgba(255,255,255,0.3)" : "#ffffff",
-                    fontFamily: "monospace",
-                    fontWeight: 900,
-                  }}
-                >
-                  ⏽
-                </span>
-              </button>
+              </Television>
             </div>
           </div>
+
+          {/* Selector Tabs (Integrated under the TV) */}
+          {isMonitorOn && (
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+              {["about", "skills", "projects", "contact"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => {
+                    setTvActiveTab(tab);
+                  }}
+                  style={{
+                    background: tvActiveTab === tab ? currentTheme.accent : "#1e2630",
+                    border: "1px solid #0d1217",
+                    borderRadius: "6px",
+                    padding: "8px 16px",
+                    color: tvActiveTab === tab ? (colorMode === "mono" ? "#0f172a" : "#000") : "rgba(255,255,255,0.5)",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    fontFamily: "monospace",
+                    cursor: "pointer",
+                    textTransform: "uppercase",
+                    boxShadow: tvActiveTab === tab ? "0 0 6px rgba(255,255,255,0.15)" : "none",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (tvActiveTab !== tab) e.currentTarget.style.color = "#ffffff";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (tvActiveTab !== tab) e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                  }}
+                >
+                  {tab === "contact" ? "contact me" : tab}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
         </div>
         <Skill colorMode={colorMode} />
         <Projects colorMode={colorMode} />
+        <Contact colorMode={colorMode} />
       </div>
     </div>
   );
