@@ -49,7 +49,7 @@ Status: Awaiting transmission...`,
 export default function About() {
   const [activeTab, setActiveTab] = useState("about"); // "about", "skills", "projects", "contact"
   const [tvActiveTab, setTvActiveTab] = useState("about"); // "about", "skills", "projects", "contact" for TV screen
-  const [colorMode, setColorMode] = useState("green"); // "cyan", "amber", "green", "mono"
+  const [colorMode] = useState("mono"); // always use mono theme
   const [isMonitorOn, setIsMonitorOn] = useState(false);
   const [terminalText, setTerminalText] = useState("");
   const [knob1Rot, setKnob1Rot] = useState(0);
@@ -76,9 +76,6 @@ export default function About() {
   }, []);
 
   const handleKnob1Click = () => {
-    const modes = ["green", "cyan", "amber", "mono"];
-    const nextIndex = (modes.indexOf(colorMode) + 1) % modes.length;
-    setColorMode(modes[nextIndex]);
     setKnob1Rot((prev) => prev + 90);
   };
 
@@ -275,6 +272,10 @@ export default function About() {
           .glass-sidebar-glow {
             display: none !important;
           }
+          .tv-column {
+            margin-top: 120px !important;
+            padding-bottom: 80px !important;
+          }
         }
         @media (min-width: 1025px) {
           .main-content-wrapper {
@@ -398,40 +399,11 @@ export default function About() {
             </button>
           </div>
 
-          {/* Bottom dials / configuration buttons */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
-            <div style={{ display: "flex", gap: "10px" }}>
-              {["green", "cyan", "amber", "mono"].map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => setColorMode(mode)}
-                  style={{
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "50%",
-                    border: colorMode === mode ? "2px solid #fff" : "1.5px solid rgba(255,255,255,0.25)",
-                    background:
-                      mode === "green"
-                        ? "#22c55e"
-                        : mode === "cyan"
-                        ? "#06b6d4"
-                        : mode === "amber"
-                        ? "#f59e0b"
-                        : "#94a3b8",
-                    cursor: "pointer",
-                    boxShadow: colorMode === mode ? "0 0 8px rgba(255,255,255,0.6)" : "none",
-                    transition: "transform 0.2s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.15)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                />
-              ))}
-            </div>
-          </div>
+
         </div>
 
         {/* ── RIGHT COLUMN: CRT TERMINAL MONITOR ── */}
-        <div style={{ flex: "1 1 400px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "28px" }}>
+        <div className="tv-column" style={{ flex: "1 1 400px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
           
           <div style={{
             display: "flex",
@@ -441,6 +413,7 @@ export default function About() {
             height: `${440 * tvScale}px`,
             overflow: "visible",
             transition: "width 0.2s ease, height 0.2s ease",
+            position: "relative",
           }}>
             <div style={{
               transform: `scale(${tvScale})`,
@@ -540,11 +513,25 @@ export default function About() {
                 )}
               </Television>
             </div>
-          </div>
 
-          {/* Selector Tabs (Integrated under the TV) */}
-          {isMonitorOn && (
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+            {/* Selector Tabs (Integrated under the TV, positioned absolutely so the TV stays centered) */}
+            <div style={{
+              position: "absolute",
+              top: "100%",
+              left: "50%",
+              transform: "translateX(-50%)",
+              marginTop: "20px",
+              display: "flex",
+              gap: "10px",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              opacity: isMonitorOn ? 1 : 0,
+              visibility: isMonitorOn ? "visible" : "hidden",
+              pointerEvents: isMonitorOn ? "auto" : "none",
+              transition: "opacity 0.3s ease, visibility 0.3s ease",
+              width: "100%",
+              zIndex: 10,
+            }}>
               {["about", "skills", "projects", "contact"].map((tab) => (
                 <button
                   key={tab}
@@ -576,7 +563,7 @@ export default function About() {
                 </button>
               ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
         </div>

@@ -184,7 +184,9 @@ const Shuffle = ({
     const isVerticalVal = shuffleDirection === 'up' || shuffleDirection === 'down';
 
     const getX = (inner, isStart) => {
-      const w = inner.parentElement.getBoundingClientRect().width;
+      const parent = inner ? inner.parentElement : null;
+      if (!parent) return 0;
+      const w = parent.getBoundingClientRect().width;
       if (shuffleDirection === 'right') {
         return isStart ? -stepsVal * w : 0;
       } else if (shuffleDirection === 'left') {
@@ -194,7 +196,9 @@ const Shuffle = ({
     };
 
     const getY = (inner, isStart) => {
-      const h = inner.parentElement.getBoundingClientRect().height;
+      const parent = inner ? inner.parentElement : null;
+      if (!parent) return 0;
+      const h = parent.getBoundingClientRect().height;
       if (shuffleDirection === 'down') {
         return isStart ? -stepsVal * h : 0;
       } else if (shuffleDirection === 'up') {

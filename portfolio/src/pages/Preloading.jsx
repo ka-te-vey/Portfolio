@@ -60,7 +60,7 @@ const injectStyles = () => {
 
 export default function Preloading({ onComplete }) {
   const [showText, setShowText] = useState(false);
-  const [colorMode, setColorMode] = useState("cyan"); // "cyan", "amber", "green", "mono"
+  const [colorMode, setColorMode] = useState("mono"); // always use mono theme
   const [isTvOn, setIsTvOn] = useState(true);
   const [knob1Rot, setKnob1Rot] = useState(0);
   const [knob2Rot, setKnob2Rot] = useState(0);
@@ -133,9 +133,6 @@ export default function Preloading({ onComplete }) {
   };
 
   const handleKnob1Click = () => {
-    const modes = ["cyan", "amber", "green", "mono"];
-    const nextIndex = (modes.indexOf(colorMode) + 1) % modes.length;
-    setColorMode(modes[nextIndex]);
     setKnob1Rot(prev => prev + 90);
   };
 
