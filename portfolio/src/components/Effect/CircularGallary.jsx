@@ -18,7 +18,7 @@ const injectStyles = () => {
       align-items: center;
       justify-content: center;
       user-select: none;
-      touch-action: none;
+      touch-action: pan-y;
       outline: none;
     }
 
@@ -88,29 +88,58 @@ export default function CircularGallary({
     scrollRef.current.target = nearestIndex * width;
   }, [getCardWidths]);
 
-  const handlePointerDown = (e) => {
+  const handlePointerDown = useCallback((e) => {
     dragRef.current.isDown = true;
     dragRef.current.startX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+    dragRef.current.startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
     dragRef.current.scrollStart = scrollRef.current.target;
     dragRef.current.hasMoved = false;
+    dragRef.current.isVerticalSwipe = false;
+    dragRef.current.isHorizontalSwipe = false;
     wasDraggingRef.current = false;
-  };
+  }, []);
 
-  const handlePointerMove = (e) => {
+  const handlePointerMove = useCallback((e) => {
     if (!dragRef.current.isDown) return;
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-    const dx = dragRef.current.startX - clientX;
-    if (Math.abs(dx) > 5) {
-      dragRef.current.hasMoved = true;
-      wasDraggingRef.current = true;
-    }
-    scrollRef.current.target = dragRef.current.scrollStart + dx * scrollSpeed;
-  };
 
-  const handlePointerUp = () => {
+    if (dragRef.current.isVerticalSwipe) return;
+
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+
+    const dx = dragRef.current.startX - clientX;
+    const dy = dragRef.current.startY - clientY;
+
+    if (!dragRef.current.isHorizontalSwipe && !dragRef.current.isVerticalSwipe) {
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+
+      if (absDx < 8 && absDy < 8) return;
+
+      if (absDy > absDx) {
+        dragRef.current.isVerticalSwipe = true;
+        return;
+      } else {
+        dragRef.current.isHorizontalSwipe = true;
+      }
+    }
+
+    if (dragRef.current.isHorizontalSwipe) {
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+      if (Math.abs(dx) > 5) {
+        dragRef.current.hasMoved = true;
+        wasDraggingRef.current = true;
+      }
+      scrollRef.current.target = dragRef.current.scrollStart + dx * scrollSpeed;
+    }
+  }, [scrollSpeed]);
+
+  const handlePointerUp = useCallback(() => {
     dragRef.current.isDown = false;
     snapToNearest();
-  };
+  }, [snapToNearest]);
 
   const handleKeyDown = (e) => {
     const width = getCardWidths();
@@ -159,12 +188,25 @@ export default function CircularGallary({
       }
     };
 
+    const onTouchStart = (e) => handlePointerDown(e);
+    const onTouchMove = (e) => handlePointerMove(e);
+    const onTouchEnd = () => handlePointerUp();
+
     el.addEventListener('wheel', onWheel, { passive: false });
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    el.addEventListener('touchcancel', onTouchEnd, { passive: true });
+
     return () => {
       el.removeEventListener('wheel', onWheel);
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchcancel', onTouchEnd);
       if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current);
     };
-  }, [scrollSpeed, snapToNearest]);
+  }, [scrollSpeed, snapToNearest, handlePointerDown, handlePointerMove, handlePointerUp]);
 
   useEffect(() => {
     const update = () => {
@@ -276,9 +318,6 @@ export default function CircularGallary({
       onMouseMove={handlePointerMove}
       onMouseUp={handlePointerUp}
       onMouseLeave={handlePointerUp}
-      onTouchStart={handlePointerDown}
-      onTouchMove={handlePointerMove}
-      onTouchEnd={handlePointerUp}
       onKeyDown={handleKeyDown}
       onClickCapture={handleCaptureClick}
     >
