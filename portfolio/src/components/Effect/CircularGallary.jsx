@@ -49,6 +49,16 @@ export default function CircularGallary({
 
   const [viewportWidth, setViewportWidth] = useState(1000);
 
+  const effectiveScrollSpeed = useMemo(() => {
+    if (viewportWidth < 600) {
+      return scrollSpeed * 2.5; // Make it significantly faster on mobile
+    }
+    if (viewportWidth < 950) {
+      return scrollSpeed * 1.8; // Moderately faster on tablet
+    }
+    return scrollSpeed; // Original speed on desktop
+  }, [viewportWidth, scrollSpeed]);
+
   useEffect(() => {
     injectStyles();
   }, []);
@@ -114,7 +124,8 @@ export default function CircularGallary({
       const absDx = Math.abs(dx);
       const absDy = Math.abs(dy);
 
-      if (absDx < 8 && absDy < 8) return;
+      // Ignore micro-movements of less than 15px (especially common during clicks on desktop)
+      if (absDx < 15 && absDy < 15) return;
 
       if (absDy > absDx) {
         dragRef.current.isVerticalSwipe = true;
@@ -128,13 +139,14 @@ export default function CircularGallary({
       if (e.cancelable) {
         e.preventDefault();
       }
-      if (Math.abs(dx) > 5) {
+      // Only flag as a drag/swipe event if the horizontal movement exceeds 10px
+      if (Math.abs(dx) > 10) {
         dragRef.current.hasMoved = true;
         wasDraggingRef.current = true;
       }
-      scrollRef.current.target = dragRef.current.scrollStart + dx * scrollSpeed;
+      scrollRef.current.target = dragRef.current.scrollStart + dx * effectiveScrollSpeed;
     }
-  }, [scrollSpeed]);
+  }, [effectiveScrollSpeed]);
 
   const handlePointerUp = useCallback(() => {
     dragRef.current.isDown = false;
@@ -179,7 +191,7 @@ export default function CircularGallary({
       if (absX > absY && absX > 0) {
         // Horizontal scroll is dominant (e.g. trackpad swipe left/right, Shift+mouse wheel)
         e.preventDefault();
-        scrollRef.current.target += dx * scrollSpeed * 0.4;
+        scrollRef.current.target += dx * effectiveScrollSpeed * 0.4;
 
         if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current);
         wheelTimeoutRef.current = setTimeout(() => {
@@ -206,7 +218,7 @@ export default function CircularGallary({
       el.removeEventListener('touchcancel', onTouchEnd);
       if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current);
     };
-  }, [scrollSpeed, snapToNearest, handlePointerDown, handlePointerMove, handlePointerUp]);
+  }, [effectiveScrollSpeed, snapToNearest, handlePointerDown, handlePointerMove, handlePointerUp]);
 
   useEffect(() => {
     const update = () => {
